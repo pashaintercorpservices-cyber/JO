@@ -21,24 +21,28 @@ export default async function ApplyPage() {
           <p>Pick any live vacancy below — you can apply with or without an account.</p>
         </div>
         <div className="card">
-          <ApplyForm
-            vacancies={(vacancies || []).map((v) => ({
-              id: v.id,
-              title: v.title,
-              country: v.country,
-              city: v.city,
-              salary_range: v.salary_range,
-            }))}
-            prefill={
-              user
-                ? {
-                    name: user.profile.full_name ?? undefined,
-                    email: user.email ?? undefined,
-                    phone: user.profile.phone ?? undefined,
-                  }
-                : undefined
-            }
-          />
+          {!vacancies || vacancies.length === 0 ? (
+            <div className="empty-state">No live vacancies to apply for right now — check back soon.</div>
+          ) : (
+            <ApplyForm
+              vacancies={vacancies.map((v) => ({
+                id: v.id,
+                title: v.title,
+                country: v.country,
+                city: v.city,
+                salary_range: v.salary_range,
+              }))}
+              prefill={
+                user
+                  ? {
+                      name: user.profile.full_name ?? undefined,
+                      email: user.email ?? undefined,
+                      phone: user.profile.phone ?? undefined,
+                    }
+                  : undefined
+              }
+            />
+          )}
         </div>
       </div>
     </section>
