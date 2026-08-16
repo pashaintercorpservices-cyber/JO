@@ -3,17 +3,17 @@
 import { useActionState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { submitApplicationAction, type ApplyFormState } from "@/lib/actions/applications";
-import type { Tables } from "@/lib/types";
 
 type Prefill = { name?: string; email?: string; phone?: string };
+type VacancyOption = { id: string; title: string; country: string };
 
 export function ApplyForm({
-  jobAd,
+  vacancy,
   vacancies,
   prefill,
 }: {
-  jobAd?: Tables<"job_ads">;
-  vacancies?: Pick<Tables<"job_ads">, "id" | "title" | "country">[];
+  vacancy?: VacancyOption;
+  vacancies?: VacancyOption[];
   prefill?: Prefill;
 }) {
   const [state, formAction] = useActionState<ApplyFormState, FormData>(
@@ -33,12 +33,12 @@ export function ApplyForm({
     <form action={formAction}>
       {state.error && <div className="form-error">{state.error}</div>}
 
-      {jobAd ? (
-        <input type="hidden" name="job_ad_id" value={jobAd.id} />
+      {vacancy ? (
+        <input type="hidden" name="job_vacancy_id" value={vacancy.id} />
       ) : (
         <div className="field">
-          <label htmlFor="job_ad_id">Position you&apos;re applying for</label>
-          <select id="job_ad_id" name="job_ad_id" required defaultValue="">
+          <label htmlFor="job_vacancy_id">Position you&apos;re applying for</label>
+          <select id="job_vacancy_id" name="job_vacancy_id" required defaultValue="">
             <option value="" disabled>
               Select a vacancy
             </option>

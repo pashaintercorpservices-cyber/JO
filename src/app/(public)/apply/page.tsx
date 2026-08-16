@@ -4,11 +4,11 @@ import { ApplyForm } from "@/components/ApplyForm";
 
 export default async function ApplyPage() {
   const supabase = await createClient();
-  const { data: ads } = await supabase
-    .from("job_ads")
-    .select("id, title, country")
-    .eq("status", "live")
-    .order("published_at", { ascending: false });
+  const { data: vacancies } = await supabase
+    .from("job_vacancies")
+    .select("id, title, country, job_ads!inner(status)")
+    .eq("job_ads.status", "live")
+    .order("created_at", { ascending: false });
 
   const user = await getCurrentUser();
 
@@ -22,7 +22,7 @@ export default async function ApplyPage() {
         </div>
         <div className="card">
           <ApplyForm
-            vacancies={ads ?? []}
+            vacancies={(vacancies || []).map((v) => ({ id: v.id, title: v.title, country: v.country }))}
             prefill={
               user
                 ? {

@@ -30,6 +30,12 @@ export default async function AdminAdDetailPage({ params }: PageProps<"/admin/ad
     .select("id", { count: "exact", head: true })
     .eq("job_ad_id", id);
 
+  const { data: vacancies } = await supabase
+    .from("job_vacancies")
+    .select("*")
+    .eq("job_ad_id", id)
+    .order("created_at", { ascending: true });
+
   const latestPayment = payments?.[0];
 
   return (
@@ -107,6 +113,41 @@ export default async function AdminAdDetailPage({ params }: PageProps<"/admin/ad
         <div className="card" style={{ marginBottom: 24 }}>
           <h2 style={{ fontSize: 16, marginBottom: 14 }}>Basic details</h2>
           <p style={{ whiteSpace: "pre-wrap" }}>{ad.description}</p>
+        </div>
+      )}
+
+      {vacancies && vacancies.length > 0 && (
+        <div className="card" style={{ marginBottom: 24 }}>
+          <h2 style={{ fontSize: 16, marginBottom: 14 }}>
+            Vacancies advertised {vacancies.length > 1 ? `(${vacancies.length})` : ""}
+          </h2>
+          <div className="table-wrap">
+            <table className="data">
+              <thead>
+                <tr>
+                  <th>Position</th>
+                  <th>Location</th>
+                  <th>Salary</th>
+                  <th>Openings</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vacancies.map((v) => (
+                  <tr key={v.id}>
+                    <td style={{ fontWeight: 700 }}>{v.title}</td>
+                    <td>
+                      {v.city ? `${v.city}, ` : ""}
+                      {v.country}
+                    </td>
+                    <td>{v.salary_range || "—"}</td>
+                    <td>{v.vacancies ?? "—"}</td>
+                    <td style={{ whiteSpace: "pre-wrap", maxWidth: 320 }}>{v.details || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

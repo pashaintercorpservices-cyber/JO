@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { VacancyRepeater } from "@/components/VacancyRepeater";
 import { createJobAdAction, type AdFormState } from "@/lib/actions/jobAds";
 import { COUNTRIES } from "@/lib/format";
 import { formatRupees } from "@/lib/format";
@@ -59,6 +60,8 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
           placeholder="Salary, benefits, experience required, qualifications…"
         />
       </div>
+
+      <VacancyRepeater />
 
       <div className="field">
         <label htmlFor="contact_email">Email to receive applications</label>

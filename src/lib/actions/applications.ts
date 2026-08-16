@@ -9,13 +9,13 @@ export async function submitApplicationAction(
   _prev: ApplyFormState,
   formData: FormData
 ): Promise<ApplyFormState> {
-  const jobAdId = String(formData.get("job_ad_id") || "");
+  const jobVacancyId = String(formData.get("job_vacancy_id") || "");
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const phone = String(formData.get("phone") || "").trim();
   const consent = formData.get("consent") === "on";
 
-  if (!jobAdId) return { error: "Select the vacancy you're applying for." };
+  if (!jobVacancyId) return { error: "Select the vacancy you're applying for." };
   if (!name || !email || !phone) {
     return { error: "Name, email and contact number are required." };
   }
@@ -28,23 +28,28 @@ export async function submitApplicationAction(
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: ad } = await supabase
-    .from("job_ads")
-    .select("id, title, status, contact_email")
-    .eq("id", jobAdId)
+  const { data: vacancy } = await supabase
+    .from("job_vacancies")
+    .select("id, title, job_ad_id, job_ads(id, status, contact_email)")
+    .eq("id", jobVacancyId)
     .single();
 
-  if (!ad || ad.status !== "live") {
+  const parentAd = (
+    vacancy as { job_ads?: { id: string; status: string; contact_email: string } } | null
+  )?.job_ads;
+
+  if (!vacancy || !parentAd || parentAd.status !== "live") {
     return { error: "This vacancy is no longer accepting applications." };
   }
 
   const { error } = await supabase.from("applications").insert({
-    job_ad_id: ad.id,
+    job_ad_id: parentAd.id,
+    job_vacancy_id: vacancy.id,
     applicant_profile_id: user?.id ?? null,
     name,
     email,
     phone,
-    position_applied: ad.title,
+    position_applied: vacancy.title,
     source: user ? "account" : "guest",
     consent: true,
   });
@@ -52,11 +57,11 @@ export async function submitApplicationAction(
   if (error) return { error: error.message };
 
   await sendApplicationEmail({
-    to: ad.contact_email,
+    to: parentAd.contact_email,
     applicantName: name,
     applicantEmail: email,
     applicantPhone: phone,
-    positionTitle: ad.title,
+    positionTitle: vacancy.title,
   });
 
   return { success: true };

@@ -64,6 +64,40 @@ export async function createJobAdAction(
 
   if (adError || !ad) return { error: adError?.message || "Could not save the ad." };
 
+  const vacancyTitles = formData.getAll("vac_title").map((v) => String(v).trim());
+  const vacancyCountries = formData.getAll("vac_country").map((v) => String(v).trim());
+  const vacancyCities = formData.getAll("vac_city").map((v) => String(v).trim());
+  const vacancySalaries = formData.getAll("vac_salary").map((v) => String(v).trim());
+  const vacancyCounts = formData.getAll("vac_count").map((v) => String(v).trim());
+  const vacancyDetails = formData.getAll("vac_details").map((v) => String(v).trim());
+
+  const vacancyRows = vacancyTitles
+    .map((vTitle, i) => ({
+      job_ad_id: ad.id,
+      title: vTitle,
+      country: vacancyCountries[i] || country,
+      city: vacancyCities[i] || city || null,
+      salary_range: vacancySalaries[i] || null,
+      vacancies: vacancyCounts[i] ? Number(vacancyCounts[i]) : null,
+      details: vacancyDetails[i] || null,
+    }))
+    .filter((v) => v.title);
+
+  if (vacancyRows.length === 0) {
+    vacancyRows.push({
+      job_ad_id: ad.id,
+      title,
+      country,
+      city: city || null,
+      salary_range: null,
+      vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
+      details: description || null,
+    });
+  }
+
+  const { error: vacError } = await supabase.from("job_vacancies").insert(vacancyRows);
+  if (vacError) return { error: vacError.message };
+
   if (isSuperAdmin) {
     const orderId = `waived_${ad.id}`;
     const { data: payment, error: payError } = await supabase

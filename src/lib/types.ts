@@ -77,6 +77,7 @@ export type Database = {
           email: string;
           id: string;
           job_ad_id: string;
+          job_vacancy_id: string | null;
           name: string;
           phone: string;
           position_applied: string;
@@ -90,6 +91,7 @@ export type Database = {
           email: string;
           id?: string;
           job_ad_id: string;
+          job_vacancy_id?: string | null;
           name: string;
           phone: string;
           position_applied: string;
@@ -97,6 +99,32 @@ export type Database = {
           source?: "guest" | "account";
         };
         Update: Partial<Database["public"]["Tables"]["applications"]["Insert"]>;
+        Relationships: [];
+      };
+      job_vacancies: {
+        Row: {
+          city: string | null;
+          country: string;
+          created_at: string;
+          details: string | null;
+          id: string;
+          job_ad_id: string;
+          salary_range: string | null;
+          title: string;
+          vacancies: number | null;
+        };
+        Insert: {
+          city?: string | null;
+          country: string;
+          created_at?: string;
+          details?: string | null;
+          id?: string;
+          job_ad_id: string;
+          salary_range?: string | null;
+          title: string;
+          vacancies?: number | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["job_vacancies"]["Insert"]>;
         Relationships: [];
       };
       job_ads: {
