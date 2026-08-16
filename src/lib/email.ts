@@ -19,15 +19,26 @@ export async function sendApplicationEmail(params: {
 }) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || "JobsOverseas <noreply@jobsoverseas.example>";
-  const subject = `New application: ${params.positionTitle}`;
+  const subject = `Application: ${params.applicantName} - ${params.positionTitle} | JobsOverseas.in`;
   const text = [
-    "New application received via JobsOverseas.",
+    "Dear Sir/Madam,",
     "",
-    `Position: ${params.positionTitle}`,
-    `Name: ${params.applicantName}`,
+    "Greetings from JobsOverseas.in.",
+    "",
+    "Please find below the details of a candidate who has applied for your vacancy through JobsOverseas.in.",
+    "",
+    `Candidate Name: ${params.applicantName}`,
     `Email: ${params.applicantEmail}`,
     `Phone: ${params.applicantPhone}`,
-    params.resumeUrl ? `Resume: ${params.resumeUrl}` : "Resume: not attached",
+    "",
+    params.resumeUrl
+      ? `Resume: Please access the candidate's CV through the link below.\n${params.resumeUrl}`
+      : "Resume: not attached",
+    "",
+    "Should you wish to proceed with the candidate, please feel free to communicate with the candidate directly.",
+    "",
+    "Best regards,",
+    "Team - JobsOverseas.in",
   ].join("\n");
   const siteUrl = "https://jobsoverseas.vercel.app";
   const html = `
@@ -44,18 +55,21 @@ export async function sendApplicationEmail(params: {
         </tr>
         <tr>
           <td style="padding:28px 24px; color:#1a2233; font-size:14px; line-height:1.6;">
-            <p style="margin:0 0 16px;">New application received via JobsOverseas.</p>
+            <p style="margin:0 0 16px;">Dear Sir/Madam,</p>
+            <p style="margin:0 0 16px;">Greetings from JobsOverseas.in.</p>
+            <p style="margin:0 0 16px;">Please find below the details of a candidate who has applied for your vacancy through JobsOverseas.in.</p>
             <p style="margin:0 0 16px;">
-              <strong>Position:</strong> ${escapeHtml(params.positionTitle)}<br>
-              <strong>Name:</strong> ${escapeHtml(params.applicantName)}<br>
+              <strong>Candidate Name:</strong> ${escapeHtml(params.applicantName)}<br>
               <strong>Email:</strong> ${escapeHtml(params.applicantEmail)}<br>
               <strong>Phone:</strong> ${escapeHtml(params.applicantPhone)}
             </p>
-            <p style="margin:0;">${
+            <p style="margin:0 0 16px;">${
               params.resumeUrl
-                ? `<a href="${escapeHtml(params.resumeUrl)}" style="display:inline-block; background:#f2861b; color:#241000; font-weight:bold; text-decoration:none; padding:10px 18px; border-radius:6px;">Download resume</a>`
+                ? `<a href="${escapeHtml(params.resumeUrl)}" style="display:inline-block; background:#f2861b; color:#241000; font-weight:bold; text-decoration:none; padding:10px 18px; border-radius:6px;">View Candidate Resume</a>`
                 : "Resume: not attached"
             }</p>
+            <p style="margin:0 0 16px;">Should you wish to proceed with the candidate, please feel free to communicate with the candidate directly.</p>
+            <p style="margin:0;">Best regards,<br>Team - JobsOverseas.in</p>
           </td>
         </tr>
         <tr>
