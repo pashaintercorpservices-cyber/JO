@@ -19,6 +19,19 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
       <div className="field">
         <label htmlFor="title">Position / vacancy title</label>
         <input id="title" name="title" type="text" required placeholder="e.g. Site Supervisor" />
+        <span className="hint">If you're only advertising one position, this is all you need — fill in the rest of the form below.</span>
+      </div>
+
+      <div className="card" style={{ background: "var(--amber-100)", marginBottom: 16, borderColor: "var(--amber-500)", borderWidth: 2, borderStyle: "solid" }}>
+        <p style={{ fontWeight: 700, marginBottom: 4, fontSize: 15 }}>
+          Advertising more than one position in this ad?
+        </p>
+        <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
+          If your flyer lists several roles (e.g. Welders, Fitters, Electricians), click below to
+          add each one with its own location and salary — candidates will be able to search and
+          apply for the exact position. Leave this empty to use the title above as the only vacancy.
+        </p>
+        <VacancyRepeater />
       </div>
 
       <div className="field-row">
@@ -68,17 +81,6 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
       </div>
 
       <ImageUploadField userId={userId} imageUrl={imageUrl} onImageUrlChange={setImageUrl} />
-
-      <div className="card" style={{ background: "var(--amber-100)", marginBottom: 16, borderColor: "var(--amber-500)" }}>
-        <p style={{ fontWeight: 700, marginBottom: 4 }}>Does your flyer advertise more than one position?</p>
-        <p style={{ fontSize: 13, color: "var(--muted)" }}>
-          If the image above lists several roles (e.g. Welders, Fitters, Electricians), add each one
-          below with its own location and salary so candidates can search and apply for the exact
-          position — otherwise skip this and the details above are used as the single vacancy.
-        </p>
-      </div>
-
-      <VacancyRepeater />
 
       <div className="card" style={{ background: "var(--surface-2)", marginBottom: 16 }}>
         <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>
