@@ -28,5 +28,8 @@ export async function sendApplicationEmail(params: {
   }
 
   const resend = new Resend(apiKey);
-  await resend.emails.send({ from, to: params.to, subject, text });
+  const { error: sendError } = await resend.emails.send({ from, to: params.to, subject, text });
+  if (sendError) {
+    console.error("[email:failed]", { to: params.to, subject, error: sendError });
+  }
 }
