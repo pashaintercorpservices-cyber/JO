@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Tables } from "@/lib/types";
-import { timeAgo } from "@/lib/format";
+import { timeAgo, COUNTRY_FLAGS } from "@/lib/format";
 
 const GRADIENTS = [
   "linear-gradient(135deg, #0a1f4a, #2c4d94)",
@@ -27,6 +27,7 @@ export function AdTile({ ad }: { ad: Tables<"job_ads"> }) {
           <span className="dot" />
           Live
         </span>
+        <span className="ad-tile-flag">{COUNTRY_FLAGS[ad.country] ?? "🌍"}</span>
       </div>
       <div className="ad-tile-body">
         <b>{ad.title}</b>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ImageUploadField } from "@/components/ImageUploadField";
 import { createJobAdAction, type AdFormState } from "@/lib/actions/jobAds";
@@ -9,6 +9,7 @@ import { formatRupees } from "@/lib/format";
 
 export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: number }) {
   const [state, formAction] = useActionState<AdFormState, FormData>(createJobAdAction, {});
+  const [imageUrl, setImageUrl] = useState("");
 
   return (
     <form action={formAction}>
@@ -65,7 +66,7 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
         <span className="hint">Every application will be emailed here and saved in your dashboard.</span>
       </div>
 
-      <ImageUploadField userId={userId} />
+      <ImageUploadField userId={userId} imageUrl={imageUrl} onImageUrlChange={setImageUrl} />
 
       <div className="card" style={{ background: "var(--surface-2)", marginBottom: 16 }}>
         <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>
@@ -75,7 +76,7 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
         </p>
       </div>
 
-      <SubmitButton>Continue to payment</SubmitButton>
+      <SubmitButton disabled={!imageUrl}>Continue to payment</SubmitButton>
     </form>
   );
 }

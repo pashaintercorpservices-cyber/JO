@@ -35,6 +35,9 @@ export async function createJobAdAction(
   if (!title || !country || !contactEmail) {
     return { error: "Position title, country, and contact email are required." };
   }
+  if (!imageUrl) {
+    return { error: "Please upload an ad image before continuing — every ad is shown as an image on the homepage." };
+  }
 
   const { data: ad, error: adError } = await supabase
     .from("job_ads")

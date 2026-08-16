@@ -60,3 +60,13 @@ export const COUNTRIES = [
   "Kuwait",
   "Other",
 ];
+
+export const COUNTRY_FLAGS: Record<string, string> = {
+  UAE: "🇦🇪",
+  "Saudi Arabia": "🇸🇦",
+  Qatar: "🇶🇦",
+  Oman: "🇴🇲",
+  Bahrain: "🇧🇭",
+  Kuwait: "🇰🇼",
+  Other: "🌍",
+};

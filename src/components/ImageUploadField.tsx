@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function ImageUploadField({ userId }: { userId: string }) {
-  const [imageUrl, setImageUrl] = useState<string>("");
+export function ImageUploadField({
+  userId,
+  imageUrl,
+  onImageUrlChange,
+}: {
+  userId: string;
+  imageUrl: string;
+  onImageUrlChange: (url: string) => void;
+}) {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -27,18 +34,20 @@ export function ImageUploadField({ userId }: { userId: string }) {
     }
 
     const { data } = supabase.storage.from("ad-images").getPublicUrl(path);
-    setImageUrl(data.publicUrl);
+    onImageUrlChange(data.publicUrl);
     setStatus("idle");
   }
 
   return (
     <div className="field">
-      <label htmlFor="ad_image">
-        Ad image <span style={{ fontWeight: 400 }}>(optional — recruitment flyer or banner)</span>
-      </label>
-      <input id="ad_image" type="file" accept="image/*" onChange={handleFile} />
+      <label htmlFor="ad_image">Ad image / flyer</label>
+      <input id="ad_image" type="file" accept="image/*" onChange={handleFile} required={!imageUrl} />
+      <span className="hint">
+        Every ad is shown as an image on the homepage — upload the recruitment flyer or banner for
+        this vacancy.
+      </span>
       {status === "uploading" && <span className="hint">Uploading…</span>}
-      {status === "error" && <span className="hint">Upload failed — you can still post without an image.</span>}
+      {status === "error" && <span className="hint">Upload failed — please try again.</span>}
       {imageUrl && (
         <img
           src={imageUrl}
