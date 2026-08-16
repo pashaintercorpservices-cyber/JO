@@ -40,3 +40,31 @@ export async function setAgencyVerifiedAction(agencyId: string, verified: boolea
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
 }
+
+// For payments received outside Razorpay (bank transfer, cash, etc.) -- confirms via the
+// same trusted confirm_ad_payment RPC used by the real Razorpay webhook, just triggered
+// manually by an admin instead of a signature-verified callback.
+export async function markAdPaidManuallyAction(jobAdId: string) {
+  const supabase = await requireAdmin();
+
+  const { data: payment, error: paymentError } = await supabase
+    .from("payments")
+    .select("id, razorpay_order_id")
+    .eq("job_ad_id", jobAdId)
+    .eq("status", "created")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (paymentError || !payment) throw new Error("No pending payment found for this ad.");
+
+  const { error } = await supabase.rpc("confirm_ad_payment", {
+    p_payment_id: payment.id,
+    p_razorpay_order_id: payment.razorpay_order_id!,
+    p_razorpay_payment_id: `manual_admin_${Date.now()}`,
+  });
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/ads");
+  revalidatePath("/admin");
+}

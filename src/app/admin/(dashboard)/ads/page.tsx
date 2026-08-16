@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { STATUS_LABEL, STATUS_BADGE_CLASS, formatDate } from "@/lib/format";
 import { AdRowActions } from "./AdRowActions";
@@ -38,7 +39,11 @@ export default async function AdminAdsPage() {
               <tbody>
                 {pending.map((ad) => (
                   <tr key={ad.id}>
-                    <td style={{ fontWeight: 700 }}>{ad.title}</td>
+                    <td style={{ fontWeight: 700 }}>
+                      <Link href={`/admin/ads/${ad.id}`} style={{ color: "var(--amber-600)" }}>
+                        {ad.title}
+                      </Link>
+                    </td>
                     <td>{(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}</td>
                     <td>{ad.country}</td>
                     <td>{formatDate(ad.created_at)}</td>
@@ -72,7 +77,11 @@ export default async function AdminAdsPage() {
             <tbody>
               {rest.map((ad) => (
                 <tr key={ad.id}>
-                  <td style={{ fontWeight: 700 }}>{ad.title}</td>
+                  <td style={{ fontWeight: 700 }}>
+                    <Link href={`/admin/ads/${ad.id}`} style={{ color: "var(--amber-600)" }}>
+                      {ad.title}
+                    </Link>
+                  </td>
                   <td>{(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}</td>
                   <td>{ad.country}</td>
                   <td>

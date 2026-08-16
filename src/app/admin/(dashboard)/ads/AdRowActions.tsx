@@ -1,11 +1,19 @@
 "use client";
 
 import { AdminActionButton } from "@/components/admin/AdminActionButton";
-import { setAdStatusAction } from "@/lib/actions/admin";
+import { setAdStatusAction, markAdPaidManuallyAction } from "@/lib/actions/admin";
 
 export function AdRowActions({ jobAdId, status }: { jobAdId: string; status: string }) {
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+      {status === "pending_payment" && (
+        <AdminActionButton
+          label="Confirm payment received"
+          className="btn btn-primary btn-sm"
+          confirmMessage="Confirm this agency paid outside Razorpay (bank transfer, cash, etc.)? This moves the ad to Pending Approval."
+          onAction={() => markAdPaidManuallyAction(jobAdId)}
+        />
+      )}
       {status === "pending_approval" && (
         <>
           <AdminActionButton
