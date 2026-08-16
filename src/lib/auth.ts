@@ -26,7 +26,7 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   if (!profile) return null;
 
   let agency: Tables<"agencies"> | null = null;
-  if (profile.role === "agency") {
+  if (profile.role === "agency" || profile.is_super_admin) {
     const { data } = await supabase
       .from("agencies")
       .select("*")

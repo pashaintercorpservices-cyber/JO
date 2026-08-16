@@ -9,17 +9,20 @@ export default async function AdminDashboardLayout({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/admin/login");
-  if (user.profile.role !== "admin") redirect("/");
+  if (user.profile.role !== "admin" && !user.profile.is_super_admin) redirect("/");
 
   return (
     <DashShell
-      roleTag="Admin"
+      roleTag={user.profile.is_super_admin ? "Admin · Super Admin" : "Admin"}
       navItems={[
         { href: "/admin", label: "Agencies" },
         { href: "/admin/ads", label: "Ads" },
         { href: "/admin/applications", label: "Applications" },
         { href: "/admin/payments", label: "Payments" },
         { href: "/admin/reports", label: "Reports" },
+        ...(user.profile.is_super_admin && user.agency
+          ? [{ href: "/agency/dashboard", label: "Agency dashboard →" }]
+          : []),
       ]}
     >
       {children}

@@ -178,6 +178,7 @@ export type Database = {
           id: string;
           phone: string | null;
           role: "agency" | "candidate" | "admin";
+          is_super_admin: boolean;
         };
         Insert: {
           created_at?: string;
@@ -185,6 +186,7 @@ export type Database = {
           id: string;
           phone?: string | null;
           role?: "agency" | "candidate" | "admin";
+          is_super_admin?: boolean;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];

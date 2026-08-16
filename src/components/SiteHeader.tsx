@@ -15,7 +15,20 @@ export async function SiteHeader() {
     </>
   );
 
-  if (user?.profile.role === "agency") {
+  if (user?.profile.is_super_admin) {
+    cta = (
+      <>
+        {user.agency && (
+          <Link className="btn btn-ghost btn-sm" href="/agency/dashboard">
+            Agency dashboard
+          </Link>
+        )}
+        <Link className="btn btn-primary btn-sm" href="/admin">
+          Admin console
+        </Link>
+      </>
+    );
+  } else if (user?.profile.role === "agency") {
     cta = (
       <Link className="btn btn-primary btn-sm" href="/agency/dashboard">
         Agency dashboard

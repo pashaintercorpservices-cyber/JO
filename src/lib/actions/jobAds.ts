@@ -23,6 +23,13 @@ export async function createJobAdAction(
     .single();
   if (!agency) return { error: "Agency profile not found." };
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_super_admin")
+    .eq("id", user.id)
+    .single();
+  const isSuperAdmin = profile?.is_super_admin ?? false;
+
   const title = String(formData.get("title") || "").trim();
   const employerName = String(formData.get("employer_name") || "").trim();
   const country = String(formData.get("country") || "").trim();
@@ -56,6 +63,30 @@ export async function createJobAdAction(
     .single();
 
   if (adError || !ad) return { error: adError?.message || "Could not save the ad." };
+
+  if (isSuperAdmin) {
+    const orderId = `waived_${ad.id}`;
+    const { data: payment, error: payError } = await supabase
+      .from("payments")
+      .insert({
+        job_ad_id: ad.id,
+        agency_id: agency.id,
+        amount_paise: 0,
+        razorpay_order_id: orderId,
+      })
+      .select("id")
+      .single();
+    if (payError || !payment) return { error: payError?.message || "Could not save the ad." };
+
+    const { error: confirmError } = await supabase.rpc("confirm_ad_payment", {
+      p_payment_id: payment.id,
+      p_razorpay_order_id: orderId,
+      p_razorpay_payment_id: "super_admin_waiver",
+    });
+    if (confirmError) return { error: confirmError.message };
+
+    redirect(`/agency/ads/${ad.id}?paid=1`);
+  }
 
   let orderId = `mock_${ad.id}`;
   const rzp = getRazorpay();
