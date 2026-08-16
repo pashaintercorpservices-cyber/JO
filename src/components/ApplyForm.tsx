@@ -2,10 +2,23 @@
 
 import { useActionState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
+import { ResumeUploadField } from "@/components/ResumeUploadField";
 import { submitApplicationAction, type ApplyFormState } from "@/lib/actions/applications";
 
 type Prefill = { name?: string; email?: string; phone?: string };
-type VacancyOption = { id: string; title: string; country: string };
+type VacancyOption = {
+  id: string;
+  title: string;
+  country: string;
+  city?: string | null;
+  salary_range?: string | null;
+};
+
+function vacancyLabel(v: VacancyOption): string {
+  const location = v.city ? `${v.city}, ${v.country}` : v.country;
+  const salary = v.salary_range ? ` · ${v.salary_range}` : "";
+  return `${v.title} — ${location}${salary}`;
+}
 
 export function ApplyForm({
   vacancy,
@@ -44,7 +57,7 @@ export function ApplyForm({
             </option>
             {(vacancies || []).map((v) => (
               <option key={v.id} value={v.id}>
-                {v.title} — {v.country}
+                {vacancyLabel(v)}
               </option>
             ))}
           </select>
@@ -65,6 +78,8 @@ export function ApplyForm({
           <input id="phone" name="phone" type="tel" required defaultValue={prefill?.phone} />
         </div>
       </div>
+
+      <ResumeUploadField />
 
       <div className="checkbox-row">
         <input id="consent" name="consent" type="checkbox" required />

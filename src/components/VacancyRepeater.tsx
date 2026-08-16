@@ -25,15 +25,18 @@ export function VacancyRepeater() {
             className="card"
             style={{ padding: 14, background: "var(--surface-2)", position: "relative" }}
           >
+            <p style={{ fontWeight: 700, fontSize: 13, marginBottom: 10, color: "var(--navy-900)" }}>
+              Position {i + 1}
+            </p>
             {rows.length > 1 && (
               <button
                 type="button"
-                className="btn btn-ghost btn-sm"
-                style={{ position: "absolute", top: 8, right: 8, padding: "4px 9px" }}
+                className="btn btn-danger btn-sm"
+                style={{ position: "absolute", top: 10, right: 10, padding: "4px 9px" }}
                 onClick={() => setRows((r) => r.filter((x) => x.key !== row.key))}
                 aria-label="Remove this vacancy"
               >
-                ✕
+                ✕ Remove
               </button>
             )}
             <div className="field-row">
@@ -76,8 +79,8 @@ export function VacancyRepeater() {
       </div>
       <button
         type="button"
-        className="btn btn-ghost btn-sm"
-        style={{ marginTop: 10 }}
+        className="btn btn-primary btn-sm"
+        style={{ marginTop: 12 }}
         onClick={() => {
           setRows((r) => [...r, { key: nextKey }]);
           setNextKey((k) => k + 1);

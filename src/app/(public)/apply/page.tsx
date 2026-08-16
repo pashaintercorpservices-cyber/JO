@@ -6,7 +6,7 @@ export default async function ApplyPage() {
   const supabase = await createClient();
   const { data: vacancies } = await supabase
     .from("job_vacancies")
-    .select("id, title, country, job_ads!inner(status)")
+    .select("id, title, country, city, salary_range, job_ads!inner(status)")
     .eq("job_ads.status", "live")
     .order("created_at", { ascending: false });
 
@@ -22,7 +22,13 @@ export default async function ApplyPage() {
         </div>
         <div className="card">
           <ApplyForm
-            vacancies={(vacancies || []).map((v) => ({ id: v.id, title: v.title, country: v.country }))}
+            vacancies={(vacancies || []).map((v) => ({
+              id: v.id,
+              title: v.title,
+              country: v.country,
+              city: v.city,
+              salary_range: v.salary_range,
+            }))}
             prefill={
               user
                 ? {

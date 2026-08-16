@@ -58,6 +58,7 @@ export default async function AdminApplicationsPage({
                 <th>Phone</th>
                 <th>Position</th>
                 <th>Agency</th>
+                <th>Resume</th>
                 <th>Source</th>
                 <th>Received</th>
               </tr>
@@ -79,6 +80,15 @@ export default async function AdminApplicationsPage({
                       {jobAd?.country ? ` (${jobAd.country})` : ""}
                     </td>
                     <td>{jobAd?.agencies?.agency_name ?? "—"}</td>
+                    <td>
+                      {app.resume_url ? (
+                        <a href={app.resume_url} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
+                          View
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                     <td>{app.source === "account" ? "Registered" : "Guest"}</td>
                     <td>{formatDate(app.created_at)}</td>
                   </tr>

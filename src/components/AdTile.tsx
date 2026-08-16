@@ -16,13 +16,13 @@ function gradientFor(id: string) {
 }
 
 export function AdTile({ ad }: { ad: Tables<"job_ads"> }) {
-  const bg = ad.image_url
-    ? { backgroundImage: `url(${ad.image_url})` }
-    : { background: gradientFor(ad.id) };
-
   return (
     <Link className="ad-tile" href={`/ads/${ad.id}`}>
-      <div className="ad-tile-img" style={bg}>
+      <div className="ad-tile-img" style={ad.image_url ? undefined : { background: gradientFor(ad.id) }}>
+        {ad.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={ad.image_url} alt={ad.title} className="ad-tile-img-el" />
+        )}
         <span className="ad-tile-badge">
           <span className="dot" />
           Live

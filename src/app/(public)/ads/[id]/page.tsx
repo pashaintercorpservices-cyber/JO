@@ -26,7 +26,13 @@ export default async function AdDetailPage({ params }: PageProps<"/ads/[id]">) {
       }
     : undefined;
 
-  const vacancyOptions = (vacancies || []).map((v) => ({ id: v.id, title: v.title, country: v.country }));
+  const vacancyOptions = (vacancies || []).map((v) => ({
+    id: v.id,
+    title: v.title,
+    country: v.country,
+    city: v.city,
+    salary_range: v.salary_range,
+  }));
 
   return (
     <section>

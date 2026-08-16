@@ -7,6 +7,7 @@ export async function sendApplicationEmail(params: {
   applicantEmail: string;
   applicantPhone: string;
   positionTitle: string;
+  resumeUrl?: string;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM || "JobsOverseas <noreply@jobsoverseas.example>";
@@ -18,6 +19,7 @@ export async function sendApplicationEmail(params: {
     `Name: ${params.applicantName}`,
     `Email: ${params.applicantEmail}`,
     `Phone: ${params.applicantPhone}`,
+    params.resumeUrl ? `Resume: ${params.resumeUrl}` : "Resume: not attached",
   ].join("\n");
 
   if (!apiKey) {

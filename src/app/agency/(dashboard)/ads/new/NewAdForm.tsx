@@ -61,8 +61,6 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
         />
       </div>
 
-      <VacancyRepeater />
-
       <div className="field">
         <label htmlFor="contact_email">Email to receive applications</label>
         <input id="contact_email" name="contact_email" type="email" required />
@@ -70,6 +68,17 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
       </div>
 
       <ImageUploadField userId={userId} imageUrl={imageUrl} onImageUrlChange={setImageUrl} />
+
+      <div className="card" style={{ background: "var(--amber-100)", marginBottom: 16, borderColor: "var(--amber-500)" }}>
+        <p style={{ fontWeight: 700, marginBottom: 4 }}>Does your flyer advertise more than one position?</p>
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>
+          If the image above lists several roles (e.g. Welders, Fitters, Electricians), add each one
+          below with its own location and salary so candidates can search and apply for the exact
+          position — otherwise skip this and the details above are used as the single vacancy.
+        </p>
+      </div>
+
+      <VacancyRepeater />
 
       <div className="card" style={{ background: "var(--surface-2)", marginBottom: 16 }}>
         <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>

@@ -87,6 +87,7 @@ export default async function AgencyAdDetailPage({
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Applied for</th>
+                <th>Resume</th>
                 <th>Source</th>
                 <th>Received</th>
               </tr>
@@ -98,6 +99,15 @@ export default async function AgencyAdDetailPage({
                   <td>{app.email}</td>
                   <td>{app.phone}</td>
                   <td>{app.position_applied}</td>
+                  <td>
+                    {app.resume_url ? (
+                      <a href={app.resume_url} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
+                        View
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
                   <td>{app.source === "account" ? "Registered candidate" : "Guest"}</td>
                   <td>{formatDate(app.created_at)}</td>
                 </tr>

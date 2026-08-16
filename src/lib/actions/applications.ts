@@ -13,6 +13,7 @@ export async function submitApplicationAction(
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const phone = String(formData.get("phone") || "").trim();
+  const resumeUrl = String(formData.get("resume_url") || "").trim();
   const consent = formData.get("consent") === "on";
 
   if (!jobVacancyId) return { error: "Select the vacancy you're applying for." };
@@ -50,6 +51,7 @@ export async function submitApplicationAction(
     email,
     phone,
     position_applied: vacancy.title,
+    resume_url: resumeUrl || null,
     source: user ? "account" : "guest",
     consent: true,
   });
@@ -62,6 +64,7 @@ export async function submitApplicationAction(
     applicantEmail: email,
     applicantPhone: phone,
     positionTitle: vacancy.title,
+    resumeUrl: resumeUrl || undefined,
   });
 
   return { success: true };
