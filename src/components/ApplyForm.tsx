@@ -21,12 +21,10 @@ function vacancyLabel(v: VacancyOption): string {
 }
 
 export function ApplyForm({
-  vacancy,
   vacancies,
   prefill,
 }: {
-  vacancy?: VacancyOption;
-  vacancies?: VacancyOption[];
+  vacancies: VacancyOption[];
   prefill?: Prefill;
 }) {
   const [state, formAction] = useActionState<ApplyFormState, FormData>(
@@ -46,23 +44,26 @@ export function ApplyForm({
     <form action={formAction}>
       {state.error && <div className="form-error">{state.error}</div>}
 
-      {vacancy ? (
-        <input type="hidden" name="job_vacancy_id" value={vacancy.id} />
-      ) : (
-        <div className="field">
-          <label htmlFor="job_vacancy_id">Position you&apos;re applying for</label>
-          <select id="job_vacancy_id" name="job_vacancy_id" required defaultValue="">
+      <div className="field">
+        <label htmlFor="job_vacancy_id">Position you&apos;re applying for</label>
+        <select
+          id="job_vacancy_id"
+          name="job_vacancy_id"
+          required
+          defaultValue={vacancies.length === 1 ? vacancies[0].id : ""}
+        >
+          {vacancies.length !== 1 && (
             <option value="" disabled>
               Select a vacancy
             </option>
-            {(vacancies || []).map((v) => (
-              <option key={v.id} value={v.id}>
-                {vacancyLabel(v)}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+          )}
+          {vacancies.map((v) => (
+            <option key={v.id} value={v.id}>
+              {vacancyLabel(v)}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="field">
         <label htmlFor="name">Full name</label>

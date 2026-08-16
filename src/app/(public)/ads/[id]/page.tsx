@@ -96,15 +96,13 @@ export default async function AdDetailPage({ params }: PageProps<"/ads/[id]">) {
           )}
         </div>
 
-        <div>
+        <div style={{ marginTop: ad.image_url ? 132 : 0 }}>
           <div className="card">
             <h2 style={{ fontSize: 19, marginBottom: 16 }}>Apply for this vacancy</h2>
             {vacancyOptions.length === 0 ? (
               <div className="empty-state">
                 Applications for this ad are being set up — please check back shortly.
               </div>
-            ) : vacancyOptions.length === 1 ? (
-              <ApplyForm vacancy={vacancyOptions[0]} prefill={prefill} />
             ) : (
               <ApplyForm vacancies={vacancyOptions} prefill={prefill} />
             )}
