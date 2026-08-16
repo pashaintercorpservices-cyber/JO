@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 
 export function ResumeUploadField() {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
-  const [resumeUrl, setResumeUrl] = useState("");
+  const [resumePath, setResumePath] = useState("");
   const [fileName, setFileName] = useState("");
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -28,8 +28,7 @@ export function ResumeUploadField() {
       return;
     }
 
-    const { data } = supabase.storage.from("resumes").getPublicUrl(path);
-    setResumeUrl(data.publicUrl);
+    setResumePath(path);
     setFileName(file.name);
     setStatus("idle");
   }
@@ -48,7 +47,7 @@ export function ResumeUploadField() {
       {status === "uploading" && <span className="hint">Uploading…</span>}
       {status === "error" && <span className="hint">Upload failed — you can still submit without a resume.</span>}
       {fileName && status === "idle" && <span className="hint">Attached: {fileName}</span>}
-      <input type="hidden" name="resume_url" value={resumeUrl} />
+      <input type="hidden" name="resume_path" value={resumePath} />
     </div>
   );
 }

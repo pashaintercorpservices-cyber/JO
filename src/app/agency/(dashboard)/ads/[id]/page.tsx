@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { getResumeSignedUrl } from "@/lib/resume";
 import { STATUS_LABEL, STATUS_BADGE_CLASS, PROMO_LABEL, formatDate } from "@/lib/format";
 
 export default async function AgencyAdDetailPage({
@@ -22,6 +23,16 @@ export default async function AgencyAdDetailPage({
     .select("*")
     .eq("job_ad_id", id)
     .order("created_at", { ascending: false });
+
+  const resumeLinks = new Map<string, string>();
+  await Promise.all(
+    (applications || [])
+      .filter((a) => a.resume_url)
+      .map(async (a) => {
+        const url = await getResumeSignedUrl(a.resume_url!);
+        if (url) resumeLinks.set(a.id, url);
+      })
+  );
 
   return (
     <>
@@ -100,8 +111,8 @@ export default async function AgencyAdDetailPage({
                   <td>{app.phone}</td>
                   <td>{app.position_applied}</td>
                   <td>
-                    {app.resume_url ? (
-                      <a href={app.resume_url} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
+                    {resumeLinks.has(app.id) ? (
+                      <a href={resumeLinks.get(app.id)} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
                         View
                       </a>
                     ) : (

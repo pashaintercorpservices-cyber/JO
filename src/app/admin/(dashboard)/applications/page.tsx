@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getResumeSignedUrl } from "@/lib/resume";
 import { formatDate } from "@/lib/format";
 
 export default async function AdminApplicationsPage({
@@ -19,6 +20,16 @@ export default async function AdminApplicationsPage({
   }
 
   const { data: applications } = await query;
+
+  const resumeLinks = new Map<string, string>();
+  await Promise.all(
+    (applications || [])
+      .filter((a) => a.resume_url)
+      .map(async (a) => {
+        const url = await getResumeSignedUrl(a.resume_url!);
+        if (url) resumeLinks.set(a.id, url);
+      })
+  );
 
   return (
     <>
@@ -81,8 +92,8 @@ export default async function AdminApplicationsPage({
                     </td>
                     <td>{jobAd?.agencies?.agency_name ?? "—"}</td>
                     <td>
-                      {app.resume_url ? (
-                        <a href={app.resume_url} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
+                      {resumeLinks.has(app.id) ? (
+                        <a href={resumeLinks.get(app.id)} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
                           View
                         </a>
                       ) : (
