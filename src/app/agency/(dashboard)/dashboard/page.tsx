@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { STATUS_LABEL, STATUS_BADGE_CLASS, PROMO_LABEL, formatDate } from "@/lib/format";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 
 export default async function AgencyDashboardPage() {
   const user = await getCurrentUser();
@@ -66,6 +67,7 @@ export default async function AgencyDashboardPage() {
                 <th>Status</th>
                 <th>FB/IG promo</th>
                 <th>Posted</th>
+                <th>Public link</th>
               </tr>
             </thead>
             <tbody>
@@ -85,6 +87,23 @@ export default async function AgencyDashboardPage() {
                   </td>
                   <td>{PROMO_LABEL[ad.promo_status]}</td>
                   <td>{formatDate(ad.created_at)}</td>
+                  <td>
+                    {ad.status === "live" ? (
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <CopyLinkButton path={`/ads/${ad.id}`} />
+                        <a
+                          href={`/ads/${ad.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ fontSize: 12.5, color: "var(--muted)" }}
+                        >
+                          Open ↗
+                        </a>
+                      </div>
+                    ) : (
+                      <span style={{ fontSize: 12.5, color: "var(--muted)" }}>Available once live</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
