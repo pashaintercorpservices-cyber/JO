@@ -117,6 +117,14 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         </div>
       </div>
 
+      <div className="wrap" style={{ marginTop: 20 }}>
+        <img
+          src="/gcc-manpower-ad.png"
+          alt="GCC Manpower Intelligence Platform — coming soon"
+          className="promo-banner-img"
+        />
+      </div>
+
       <section style={{ paddingTop: 20, paddingBottom: 0 }}>
         <div className="wrap">
           <div className="trust-strip">
@@ -156,26 +164,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         <div className="wrap">
           <BannerCarousel />
 
-          {countriesWithAds.length > 0 && (
-            <>
-              <div className="section-head" style={{ marginBottom: 16, maxWidth: "none" }}>
-                <p className="eyebrow">Browse by country</p>
-                <h2 style={{ fontSize: 22 }}>Where we&apos;re hiring right now</h2>
-              </div>
-              <div className="country-tile-grid">
-                {countriesWithAds.map((c) => (
-                  <Link key={c} href={`/?country=${encodeURIComponent(c)}`} className="country-tile">
-                    <span className="flag">{COUNTRY_FLAGS[c]}</span>
-                    <b>{c}</b>
-                    <span>
-                      {countryCounts.get(c)} live ad{countryCounts.get(c) === 1 ? "" : "s"}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-
           <div className="ads-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28 }}>
             <div className="section-head" style={{ margin: 0 }}>
               <p className="eyebrow">
@@ -205,6 +193,26 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 <AdTile key={ad.id} ad={ad} />
               ))}
             </div>
+          )}
+
+          {countriesWithAds.length > 0 && (
+            <>
+              <div className="section-head" style={{ marginBottom: 16, marginTop: 40, maxWidth: "none" }}>
+                <p className="eyebrow">Browse by country</p>
+                <h2 style={{ fontSize: 22 }}>Where we&apos;re hiring right now</h2>
+              </div>
+              <div className="country-tile-grid">
+                {countriesWithAds.map((c) => (
+                  <Link key={c} href={`/?country=${encodeURIComponent(c)}`} className="country-tile">
+                    <span className="flag">{COUNTRY_FLAGS[c]}</span>
+                    <b>{c}</b>
+                    <span>
+                      {countryCounts.get(c)} live ad{countryCounts.get(c) === 1 ? "" : "s"}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
 
           <div className="hiring-banner">
