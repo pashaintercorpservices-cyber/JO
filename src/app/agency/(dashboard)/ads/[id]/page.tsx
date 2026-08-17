@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getResumeSignedUrl } from "@/lib/resume";
 import { STATUS_LABEL, STATUS_BADGE_CLASS, PROMO_LABEL, formatDate } from "@/lib/format";
+import { CopyLinkButton } from "@/components/CopyLinkButton";
 
 export default async function AgencyAdDetailPage({
   params,
@@ -82,9 +83,12 @@ export default async function AgencyAdDetailPage({
         {ad.status === "live" && (
           <div>
             <div style={{ fontSize: 12, color: "var(--muted)", textTransform: "uppercase" }}>Public link</div>
-            <Link href={`/ads/${ad.id}`} style={{ fontWeight: 700, color: "var(--amber-600)" }}>
-              View live ad →
-            </Link>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 6 }}>
+              <CopyLinkButton path={`/ads/${ad.id}`} />
+              <Link href={`/ads/${ad.id}`} style={{ fontWeight: 700, color: "var(--amber-600)" }}>
+                View live ad →
+              </Link>
+            </div>
           </div>
         )}
       </div>
