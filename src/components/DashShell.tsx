@@ -16,7 +16,7 @@ export function DashShell({
       <header className="site">
         <div className="nav-row">
           <Link className="brand" href="/">
-            <span className="brand-mark" />
+            <img src="/logo-icon.png" alt="" className="brand-mark" />
             Jobs<span className="o">Overseas</span>
           </Link>
         </div>

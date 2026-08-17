@@ -48,6 +48,7 @@ export async function sendApplicationEmail(params: {
         <tr>
           <td align="center" style="background:#0a1f4a; padding:22px 24px;">
             <a href="${siteUrl}" style="text-decoration:none;">
+              <img src="${siteUrl}/logo-icon-light.png" width="40" height="40" alt="JobsOverseas.in" style="display:block; margin:0 auto 8px;">
               <span style="font-size:22px; font-weight:bold; color:#ffffff;">Jobs<span style="color:#f2861b;">Overseas</span>.in</span>
             </a>
             <div style="font-size:12px; color:#c9d3ea; margin-top:4px;">Advertise the job. Track the hire.</div>
