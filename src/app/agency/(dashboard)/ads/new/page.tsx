@@ -12,7 +12,7 @@ export default async function NewAdPage() {
       <div className="section-head">
         <p className="eyebrow">Agency</p>
         <h1>Post a new vacancy</h1>
-        <p>This goes live on the JobsOverseas homepage once payment is confirmed and an admin approves it.</p>
+        <p>This goes live on the JobOverseas homepage once payment is confirmed and an admin approves it.</p>
       </div>
       <NewAdForm userId={user.id} feePaise={AD_POST_FEE_PAISE} />
     </>

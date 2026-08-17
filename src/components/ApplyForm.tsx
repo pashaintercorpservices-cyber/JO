@@ -85,7 +85,7 @@ export function ApplyForm({
       <div className="checkbox-row">
         <input id="consent" name="consent" type="checkbox" required />
         <label htmlFor="consent">
-          I consent to JobsOverseas sharing these details with the agency advertising this
+          I consent to JobOverseas sharing these details with the agency advertising this
           vacancy, for the purpose of this application.
         </label>
       </div>

@@ -52,7 +52,7 @@ export function PaymentPanel({
         key: razorpayKeyId,
         amount: amountPaise,
         currency: "INR",
-        name: "JobsOverseas",
+        name: "JobOverseas",
         description: "Job ad posting fee",
         order_id: orderId,
         handler: async (response: {

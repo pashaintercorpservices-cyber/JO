@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "JobsOverseas — Advertise the job. Track the hire.",
+  title: "JobOverseas — Advertise the job. Track the hire.",
   description:
-    "JobsOverseas is where licensed overseas recruitment agencies post vacancies and candidates apply, directly.",
+    "JobOverseas is where licensed overseas recruitment agencies post vacancies and candidates apply, directly.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

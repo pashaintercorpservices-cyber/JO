@@ -19,8 +19,8 @@ function wrapEmailHtml(bodyHtml: string): string {
         <tr>
           <td align="center" style="background:#0a1f4a; padding:22px 24px;">
             <a href="${SITE_URL}" style="text-decoration:none;">
-              <img src="${SITE_URL}/logo-icon-light.png" width="40" height="40" alt="JobsOverseas.in" style="display:block; margin:0 auto 8px;">
-              <span style="font-size:22px; font-weight:bold; color:#ffffff;">Jobs<span style="color:#f2861b;">Overseas</span>.in</span>
+              <img src="${SITE_URL}/logo-icon-light.png" width="40" height="40" alt="JobOverseas.in" style="display:block; margin:0 auto 8px;">
+              <span style="font-size:22px; font-weight:bold; color:#ffffff;">Job<span style="color:#f2861b;">Overseas</span>.in</span>
             </a>
             <div style="font-size:12px; color:#c9d3ea; margin-top:4px;">Advertise the job. Track the hire.</div>
           </td>
@@ -32,7 +32,7 @@ function wrapEmailHtml(bodyHtml: string): string {
         </tr>
         <tr>
           <td align="center" style="background:#0a1f4a; padding:16px 24px; font-size:11px; color:#c9d3ea;">
-            JobsOverseas.in &middot; Advertising platform for licensed overseas recruitment agencies<br>
+            JobOverseas.in &middot; Advertising platform for licensed overseas recruitment agencies<br>
             <a href="${SITE_URL}" style="color:#f2861b;">${SITE_URL.replace("https://", "")}</a>
           </td>
         </tr>
@@ -44,7 +44,7 @@ function wrapEmailHtml(bodyHtml: string): string {
 
 async function sendEmail(params: { to: string; subject: string; text: string; html: string }) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM || "JobsOverseas <noreply@jobsoverseas.example>";
+  const from = process.env.EMAIL_FROM || "JobOverseas <noreply@jobsoverseas.example>";
 
   if (!apiKey) {
     console.log("[email:mock]", { to: params.to, subject: params.subject, text: params.text });
@@ -72,13 +72,13 @@ export async function sendApplicationEmail(params: {
   positionTitle: string;
   resumeUrl?: string;
 }) {
-  const subject = `Application: ${params.applicantName} - ${params.positionTitle} | JobsOverseas.in`;
+  const subject = `Application: ${params.applicantName} - ${params.positionTitle} | JobOverseas.in`;
   const text = [
     "Dear Sir/Madam,",
     "",
-    "Greetings from JobsOverseas.in.",
+    "Greetings from JobOverseas.in.",
     "",
-    "Please find below the details of a candidate who has applied for your vacancy through JobsOverseas.in.",
+    "Please find below the details of a candidate who has applied for your vacancy through JobOverseas.in.",
     "",
     `Candidate Name: ${params.applicantName}`,
     `Email: ${params.applicantEmail}`,
@@ -91,12 +91,12 @@ export async function sendApplicationEmail(params: {
     "Should you wish to proceed with the candidate, please feel free to communicate with the candidate directly.",
     "",
     "Best regards,",
-    "Team - JobsOverseas.in",
+    "Team - JobOverseas.in",
   ].join("\n");
   const html = wrapEmailHtml(`
     <p style="margin:0 0 16px;">Dear Sir/Madam,</p>
-    <p style="margin:0 0 16px;">Greetings from JobsOverseas.in.</p>
-    <p style="margin:0 0 16px;">Please find below the details of a candidate who has applied for your vacancy through JobsOverseas.in.</p>
+    <p style="margin:0 0 16px;">Greetings from JobOverseas.in.</p>
+    <p style="margin:0 0 16px;">Please find below the details of a candidate who has applied for your vacancy through JobOverseas.in.</p>
     <p style="margin:0 0 16px;">
       <strong>Candidate Name:</strong> ${escapeHtml(params.applicantName)}<br>
       <strong>Email:</strong> ${escapeHtml(params.applicantEmail)}<br>
@@ -108,7 +108,7 @@ export async function sendApplicationEmail(params: {
         : "Resume: not attached"
     }</p>
     <p style="margin:0 0 16px;">Should you wish to proceed with the candidate, please feel free to communicate with the candidate directly.</p>
-    <p style="margin:0;">Best regards,<br>Team - JobsOverseas.in</p>
+    <p style="margin:0;">Best regards,<br>Team - JobOverseas.in</p>
   `);
 
   await sendEmail({ to: params.to, subject, text, html });
@@ -124,7 +124,7 @@ export async function sendCandidateConfirmationEmail(params: {
   contactEmail: string;
   contactPhone?: string | null;
 }) {
-  const subject = `Your application for ${params.positionTitle} has been received | JobsOverseas.in`;
+  const subject = `Your application for ${params.positionTitle} has been received | JobOverseas.in`;
   const employerLine = params.employerName ? ` at ${params.employerName}` : "";
   const resumeLine = params.hasResume
     ? "We have shared your resume with the advertising agency directly."
@@ -139,7 +139,7 @@ export async function sendCandidateConfirmationEmail(params: {
   const text = [
     `Dear ${params.applicantName},`,
     "",
-    `Thank you for applying for the position of ${params.positionTitle}${employerLine} through JobsOverseas.in.`,
+    `Thank you for applying for the position of ${params.positionTitle}${employerLine} through JobOverseas.in.`,
     "",
     resumeLine,
     "",
@@ -150,12 +150,12 @@ export async function sendCandidateConfirmationEmail(params: {
     "We wish you the very best for your application.",
     "",
     "Best regards,",
-    "Team - JobsOverseas.in",
+    "Team - JobOverseas.in",
   ].join("\n");
 
   const html = wrapEmailHtml(`
     <p style="margin:0 0 16px;">Dear ${escapeHtml(params.applicantName)},</p>
-    <p style="margin:0 0 16px;">Thank you for applying for the position of <strong>${escapeHtml(params.positionTitle)}</strong>${employerLine ? ` at <strong>${escapeHtml(params.employerName!)}</strong>` : ""} through JobsOverseas.in.</p>
+    <p style="margin:0 0 16px;">Thank you for applying for the position of <strong>${escapeHtml(params.positionTitle)}</strong>${employerLine ? ` at <strong>${escapeHtml(params.employerName!)}</strong>` : ""} through JobOverseas.in.</p>
     <p style="margin:0 0 16px;">${escapeHtml(resumeLine)}</p>
     <p style="margin:0 0 8px;">If you have any questions or need further information about this vacancy, please feel free to reach out to the hiring manager directly using the details below:</p>
     <p style="margin:0 0 16px; padding:14px 16px; background:#eef2f9; border-radius:8px;">
@@ -172,7 +172,7 @@ export async function sendCandidateConfirmationEmail(params: {
       }
     </p>
     <p style="margin:0 0 16px;">We wish you the very best for your application.</p>
-    <p style="margin:0;">Best regards,<br>Team - JobsOverseas.in</p>
+    <p style="margin:0;">Best regards,<br>Team - JobOverseas.in</p>
   `);
 
   await sendEmail({ to: params.to, subject, text, html });

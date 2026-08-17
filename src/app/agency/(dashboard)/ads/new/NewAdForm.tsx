@@ -100,7 +100,7 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
         <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>
         <p style={{ fontSize: 13.5, color: "var(--muted)" }}>
           Includes a Facebook &amp; Instagram promotion of your ad (₹1,500 budget, run over 2 days
-          by the JobsOverseas team). Payment is collected on the next step via Razorpay.
+          by the JobOverseas team). Payment is collected on the next step via Razorpay.
         </p>
       </div>
 
