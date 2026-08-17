@@ -199,15 +199,15 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .hero-agency-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; font-size: 13.5px; font-weight: 700; color: #dbe3f7; }
 .hero-agency-link:hover { color: #fff; }
 
-.hero-mini-carousel { margin-top: 18px; max-width: 360px; }
+.hero-mini-carousel { margin-top: 18px; max-width: 450px; }
 .hero-mini-carousel .promo-carousel {
   height: 108px; margin-bottom: 0; border: 1px solid rgba(255,255,255,0.35);
 }
-.hero-mini-carousel .promo-slide { padding: 0 18px; }
-.hero-mini-carousel .promo-slide .eyebrow { font-size: 10.5px; }
-.hero-mini-carousel .promo-slide h3 { font-size: 15px; margin: 4px 0 2px; }
-.hero-mini-carousel .promo-slide p { font-size: 11.5px; line-height: 1.35; }
-.hero-mini-carousel .promo-dots { bottom: 8px; left: 18px; }
+.hero-mini-carousel .promo-slide { padding: 0 22px; }
+.hero-mini-carousel .promo-slide .eyebrow { font-size: 11px; }
+.hero-mini-carousel .promo-slide h3 { font-size: 17px; margin: 5px 0 3px; }
+.hero-mini-carousel .promo-slide p { font-size: 12.5px; line-height: 1.4; max-width: none; }
+.hero-mini-carousel .promo-dots { bottom: 9px; left: 22px; }
 
 .hero-rich-promo { flex: 1.3 1 380px; max-width: 500px; }
 .promo-banner-img {
@@ -371,4 +371,6 @@ footer.site { border-top: 1px solid var(--border); padding: 40px 0 28px; margin-
   .hero-search-row { flex-direction: column; }
   .hero-search-row select, .hero-search-row input, .hero-search-row button { width: 100%; }
   .hero-mini-carousel { max-width: none; }
+  .hero-mini-carousel .promo-carousel { height: 140px; }
+  .hero-mini-carousel .promo-slide { padding: 0 16px; }
 }
