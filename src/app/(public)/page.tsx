@@ -88,6 +88,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             <Link className="hero-agency-link" href="/agency/register">
               Are you a recruitment agency? Post a vacancy →
             </Link>
+            <div className="hero-mini-carousel">
+              <BannerCarousel />
+            </div>
           </div>
           <div className="hero-rich-promo">
             <img
@@ -126,7 +129,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         </div>
       </div>
 
-      <section style={{ paddingTop: 4, paddingBottom: 0 }}>
+      <section style={{ paddingTop: 24, paddingBottom: 0 }}>
         <div className="wrap">
           <div className="trust-strip">
             <div className="trust-item">
@@ -161,17 +164,15 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         </div>
       </section>
 
-      <section style={{ paddingTop: 4, paddingBottom: 24 }}>
+      <section style={{ paddingTop: 24, paddingBottom: 24 }}>
         <div className="wrap">
-          <BannerCarousel />
-
-          <div className="ads-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 4 }}>
+          <div className="ads-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 20 }}>
             <div className="section-head" style={{ margin: 0 }}>
               <p className="eyebrow">
                 Live right now{country ? ` · ${country}` : ""}
                 {q ? ` · "${q}"` : ""}
               </p>
-              <h2 style={{ margin: "4px 0 0", fontSize: 22 }}>{ads.length} open vacancies</h2>
+              <h2 style={{ margin: "6px 0 0", fontSize: 24 }}>{ads.length} open vacancies</h2>
             </div>
             {(country || q) && (
               <Link className="btn btn-ghost btn-sm" href="/">
