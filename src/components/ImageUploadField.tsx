@@ -44,16 +44,32 @@ export function ImageUploadField({
       <input id="ad_image" type="file" accept="image/*" onChange={handleFile} required={!imageUrl} />
       <span className="hint">
         Every ad is shown as an image on the homepage — upload the recruitment flyer or banner for
-        this vacancy.
+        this vacancy. Recommended size: 1080 × 1080px (square) or 1080 × 1350px (portrait) —
+        the same format typically used for WhatsApp flyers. JPG or PNG.
       </span>
       {status === "uploading" && <span className="hint">Uploading…</span>}
       {status === "error" && <span className="hint">Upload failed — please try again.</span>}
       {imageUrl && (
-        <img
-          src={imageUrl}
-          alt="Ad preview"
-          style={{ marginTop: 10, maxHeight: 140, borderRadius: 10, border: "1px solid var(--border)" }}
-        />
+        <div
+          style={{
+            marginTop: 10,
+            width: 180,
+            height: 180,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 10,
+            border: "1px solid var(--border)",
+            background: "var(--surface-2)",
+            overflow: "hidden",
+          }}
+        >
+          <img
+            src={imageUrl}
+            alt="Ad preview"
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          />
+        </div>
       )}
       <input type="hidden" name="image_url" value={imageUrl} />
     </div>
