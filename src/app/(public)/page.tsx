@@ -76,17 +76,26 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     <>
       <section className="hero-rich">
         <div className="wrap">
-          <p className="eyebrow">For candidates</p>
-          <h1>
-            Find your next job <em>abroad</em>
-          </h1>
-          <p>
-            Every ad below is a real vacancy posted by a registered agency and reviewed by our
-            team — apply directly, with or without an account.
-          </p>
-          <Link className="hero-agency-link" href="/agency/register">
-            Are you a recruitment agency? Post a vacancy →
-          </Link>
+          <div className="hero-rich-text">
+            <p className="eyebrow">For candidates</p>
+            <h1>
+              Find your next job <em>abroad</em>
+            </h1>
+            <p>
+              Every ad below is a real vacancy posted by a registered agency and reviewed by our
+              team — apply directly, with or without an account.
+            </p>
+            <Link className="hero-agency-link" href="/agency/register">
+              Are you a recruitment agency? Post a vacancy →
+            </Link>
+          </div>
+          <div className="hero-rich-promo">
+            <img
+              src="/gcc-manpower-ad.png"
+              alt="GCC Manpower Intelligence Platform — coming soon"
+              className="promo-banner-img"
+            />
+          </div>
         </div>
       </section>
 
@@ -115,14 +124,6 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="wrap" style={{ marginTop: 20 }}>
-        <img
-          src="/gcc-manpower-ad.png"
-          alt="GCC Manpower Intelligence Platform — coming soon"
-          className="promo-banner-img"
-        />
       </div>
 
       <section style={{ paddingTop: 20, paddingBottom: 0 }}>
