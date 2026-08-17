@@ -3,7 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/types";
 import { AdTile } from "@/components/AdTile";
 import { BannerCarousel } from "@/components/BannerCarousel";
-import { CategoryStrip } from "@/components/CategoryStrip";
+import { COUNTRIES, COUNTRY_FLAGS } from "@/lib/format";
+
+const POPULAR_SEARCHES = ["Welder", "Electrician", "Driver", "HVAC Technician", "Nurse", "Site Supervisor"];
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
@@ -59,25 +61,93 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     ads = data || [];
   }
 
+  // Real, unfiltered counts for the country tiles -- honest numbers only, no placeholders.
+  const { data: liveAdsForCounts } = await supabase
+    .from("job_ads")
+    .select("country")
+    .eq("status", "live");
+  const countryCounts = new Map<string, number>();
+  (liveAdsForCounts || []).forEach((a) => {
+    countryCounts.set(a.country, (countryCounts.get(a.country) || 0) + 1);
+  });
+  const countriesWithAds = COUNTRIES.filter((c) => c !== "Other" && countryCounts.has(c));
+
   return (
     <>
-      <section className="hero-slim">
+      <section className="hero-rich">
         <div className="wrap">
-          <p className="eyebrow">For licensed overseas recruitment agencies</p>
+          <p className="eyebrow">For candidates</p>
           <h1>
-            Advertise the job. <em style={{ fontStyle: "normal", color: "var(--amber-600)" }}>Candidates apply directly.</em>
+            Find your next job <em>abroad</em>
           </h1>
           <p>
-            Every ad below is a real vacancy posted by a registered agency and approved by our
-            team — candidates can apply with or without an account.
+            Every ad below is a real vacancy posted by a registered agency and reviewed by our
+            team — apply directly, with or without an account.
           </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link className="btn btn-primary btn-sm" href="/agency/register">
-              Register your agency →
-            </Link>
-            <Link className="btn btn-ghost btn-sm" href="/apply">
-              Apply for a vacancy
-            </Link>
+          <Link className="hero-agency-link" href="/agency/register">
+            Are you a recruitment agency? Post a vacancy →
+          </Link>
+        </div>
+      </section>
+
+      <div className="wrap">
+        <div className="hero-search-card">
+          <form method="get" className="hero-search-row">
+            <input type="text" name="q" defaultValue={q} placeholder="Job title, skill or keyword" />
+            <select name="country" defaultValue={country ?? ""}>
+              <option value="">All countries</option>
+              {COUNTRIES.filter((c) => c !== "Other").map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <button className="btn btn-primary" type="submit">
+              Search
+            </button>
+          </form>
+          <div className="popular-searches">
+            <span>Popular:</span>
+            {POPULAR_SEARCHES.map((term) => (
+              <Link key={term} href={`/?q=${encodeURIComponent(term)}`}>
+                {term}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <section style={{ paddingBottom: 0 }}>
+        <div className="wrap">
+          <div className="trust-strip">
+            <div className="trust-item">
+              <div className="ico">✓</div>
+              <div>
+                <h4>Reviewed before going live</h4>
+                <p>Every ad is checked by our team before it appears on the site.</p>
+              </div>
+            </div>
+            <div className="trust-item">
+              <div className="ico">→</div>
+              <div>
+                <h4>Apply directly</h4>
+                <p>No recruitment agents in between — your details go straight to the agency.</p>
+              </div>
+            </div>
+            <div className="trust-item">
+              <div className="ico">☎</div>
+              <div>
+                <h4>Hiring manager contact shared</h4>
+                <p>Get a confirmation email with a direct contact so you can follow up yourself.</p>
+              </div>
+            </div>
+            <div className="trust-item">
+              <div className="ico">＋</div>
+              <div>
+                <h4>No account required</h4>
+                <p>Apply as a guest, or register to track your applications over time.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -86,32 +156,25 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         <div className="wrap">
           <BannerCarousel />
 
-          <form method="get" style={{ display: "flex", gap: 10, marginBottom: 20, maxWidth: 460 }}>
-            {country && <input type="hidden" name="country" value={country} />}
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder="Search position, city, employer…"
-              style={{
-                flex: 1,
-                padding: "11px 14px",
-                borderRadius: 9,
-                border: "1px solid var(--border)",
-                fontSize: 14.5,
-              }}
-            />
-            <button className="btn btn-primary btn-sm" type="submit">
-              Search
-            </button>
-            {q && (
-              <Link className="btn btn-ghost btn-sm" href={country ? `/?country=${country}` : "/"}>
-                Clear
-              </Link>
-            )}
-          </form>
-
-          <CategoryStrip activeCountry={country} />
+          {countriesWithAds.length > 0 && (
+            <>
+              <div className="section-head" style={{ marginBottom: 16, maxWidth: "none" }}>
+                <p className="eyebrow">Browse by country</p>
+                <h2 style={{ fontSize: 22 }}>Where we&apos;re hiring right now</h2>
+              </div>
+              <div className="country-tile-grid">
+                {countriesWithAds.map((c) => (
+                  <Link key={c} href={`/?country=${encodeURIComponent(c)}`} className="country-tile">
+                    <span className="flag">{COUNTRY_FLAGS[c]}</span>
+                    <b>{c}</b>
+                    <span>
+                      {countryCounts.get(c)} live ad{countryCounts.get(c) === 1 ? "" : "s"}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
 
           <div className="ads-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 28 }}>
             <div className="section-head" style={{ margin: 0 }}>
@@ -121,6 +184,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               </p>
               <h2>{ads.length} open vacancies</h2>
             </div>
+            {(country || q) && (
+              <Link className="btn btn-ghost btn-sm" href="/">
+                Clear filters
+              </Link>
+            )}
           </div>
 
           {ads.length === 0 ? (
@@ -138,6 +206,19 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
               ))}
             </div>
           )}
+
+          <div className="hiring-banner">
+            <div>
+              <h3>Are you a recruitment agency?</h3>
+              <p>
+                Post a vacancy for ₹9,999 flat — includes a Facebook &amp; Instagram promotion,
+                reviewed and live within hours.
+              </p>
+            </div>
+            <Link className="btn btn-primary" href="/agency/register">
+              Post a job →
+            </Link>
+          </div>
         </div>
       </section>
     </>

@@ -171,6 +171,80 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .hero-slim h1 { font-size: 27px; line-height: 1.2; margin: 6px 0 8px; }
 .hero-slim p { font-size: 14.5px; color: var(--muted); max-width: 620px; margin-bottom: 14px; }
 
+/* ============ Rich hero ============ */
+.hero-rich {
+  position: relative;
+  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 55%, var(--navy-500) 100%);
+  color: #fff;
+  padding: 56px 0 92px;
+  overflow: hidden;
+}
+.hero-rich::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.14) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.hero-rich .wrap { position: relative; z-index: 1; }
+.hero-rich .eyebrow { color: #ffcf94; }
+.hero-rich h1 { font-size: 36px; line-height: 1.15; margin: 10px 0 14px; max-width: 620px; color: #fff; }
+.hero-rich h1 em { font-style: normal; color: var(--amber-500); }
+.hero-rich > .wrap > p { font-size: 15px; color: #cfd8ef; max-width: 560px; margin-bottom: 4px; }
+.hero-agency-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 18px; font-size: 13.5px; font-weight: 700; color: #dbe3f7; }
+.hero-agency-link:hover { color: #fff; }
+
+.hero-search-card {
+  background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 18px; margin-top: -56px; position: relative; z-index: 2;
+}
+.hero-search-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-search-row input[type="text"] {
+  flex: 2 1 220px; padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); font-size: 14.5px;
+  font-family: var(--sans);
+}
+.hero-search-row select {
+  flex: 1 1 160px; padding: 12px 14px; border-radius: 9px; border: 1px solid var(--border); font-size: 14.5px;
+  background: var(--surface); font-family: var(--sans); color: var(--ink);
+}
+.popular-searches { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+.popular-searches a {
+  padding: 5px 12px; border-radius: 999px; background: var(--surface-2); font-weight: 700; color: var(--navy-900);
+}
+.popular-searches a:hover { background: var(--amber-100); }
+
+/* ============ Trust strip ============ */
+.trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 44px 0 4px; }
+.trust-item { display: flex; gap: 12px; align-items: flex-start; }
+.trust-item .ico {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--amber-100); color: var(--amber-600);
+  display: flex; align-items: center; justify-content: center; flex: none; font-size: 18px;
+}
+.trust-item h4 { font-size: 13.5px; margin-bottom: 3px; }
+.trust-item p { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+/* ============ Country tiles ============ */
+.country-tile-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 40px; }
+.country-tile {
+  position: relative; border-radius: 12px; overflow: hidden; padding: 16px 14px; min-height: 92px;
+  display: flex; flex-direction: column; justify-content: flex-end; color: #fff;
+  background: linear-gradient(135deg, var(--navy-800), var(--navy-500));
+  transition: transform 0.15s ease;
+}
+.country-tile:hover { transform: translateY(-2px); }
+.country-tile .flag { font-size: 20px; margin-bottom: 6px; }
+.country-tile b { font-size: 13px; font-family: var(--sans); }
+.country-tile span { font-size: 11px; color: #dbe3f7; }
+
+/* ============ Hiring banner ============ */
+.hiring-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  background: var(--navy-900); color: #fff; border-radius: var(--radius); padding: 26px 30px; margin-top: 12px;
+}
+.hiring-banner h3 { font-size: 18px; margin-bottom: 4px; color: #fff; }
+.hiring-banner p { font-size: 13.5px; color: #cfd8ef; max-width: 460px; }
+
 /* ============ Promo banner carousel ============ */
 .promo-carousel { position: relative; border-radius: var(--radius); overflow: hidden; height: 160px; margin-bottom: 32px; }
 .promo-slide {
@@ -259,12 +333,20 @@ footer.site { border-top: 1px solid var(--border); padding: 40px 0 28px; margin-
   .dash-side { border-right: none; border-bottom: 1px solid var(--border); }
   .stat-grid { grid-template-columns: 1fr 1fr; }
   .field-row { grid-template-columns: 1fr; }
+  .trust-strip { grid-template-columns: 1fr 1fr; }
+  .country-tile-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 700px) {
   .ad-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-rich h1 { font-size: 28px; }
+  .hiring-banner { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 620px) {
   .wrap, .wrap-narrow, .nav-row { padding: 0 18px; }
   section { padding: 40px 0; }
   .dash-main { padding: 20px; }
+  .trust-strip { grid-template-columns: 1fr; }
+  .country-tile-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-search-row { flex-direction: column; }
+  .hero-search-row select, .hero-search-row input, .hero-search-row button { width: 100%; }
 }
