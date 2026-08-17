@@ -117,7 +117,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
         </div>
       </div>
 
-      <section style={{ paddingBottom: 0 }}>
+      <section style={{ paddingTop: 20, paddingBottom: 0 }}>
         <div className="wrap">
           <div className="trust-strip">
             <div className="trust-item">
@@ -210,10 +210,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           <div className="hiring-banner">
             <div>
               <h3>Are you a recruitment agency?</h3>
-              <p>
-                Post a vacancy for ₹9,999 flat — includes a Facebook &amp; Instagram promotion,
-                reviewed and live within hours.
-              </p>
+              <p>Reach candidates directly — post your vacancy and we&apos;ll review it fast.</p>
             </div>
             <Link className="btn btn-primary" href="/agency/register">
               Post a job →

@@ -215,7 +215,7 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .popular-searches a:hover { background: var(--amber-100); }
 
 /* ============ Trust strip ============ */
-.trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 44px 0 4px; }
+.trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 4px 0; }
 .trust-item { display: flex; gap: 12px; align-items: flex-start; }
 .trust-item .ico {
   width: 40px; height: 40px; border-radius: 10px; background: var(--amber-100); color: var(--amber-600);

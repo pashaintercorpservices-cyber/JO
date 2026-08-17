@@ -12,7 +12,7 @@ const SLIDES = [
   {
     eyebrow: "For agencies",
     title: "Post a vacancy, go live in minutes",
-    body: "₹9,999 flat — includes a Facebook & Instagram promotion of your ad, run by our team.",
+    body: "Every ad includes a Facebook & Instagram promotion, run by our team — extra reach, zero extra effort on your part.",
     bg: "linear-gradient(120deg, #4a2b0a, #c2701c)",
   },
   {
