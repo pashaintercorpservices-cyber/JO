@@ -3,16 +3,23 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function ResumeUploadField() {
+export function ResumeUploadField({ onReadyChange }: { onReadyChange: (ready: boolean) => void }) {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [resumePath, setResumePath] = useState("");
   const [fileName, setFileName] = useState("");
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      setResumePath("");
+      setFileName("");
+      onReadyChange(false);
+      return;
+    }
 
     setStatus("uploading");
+    setResumePath("");
+    onReadyChange(false);
     const supabase = createClient();
     const ext = file.name.split(".").pop();
     const token = crypto.randomUUID();
@@ -31,21 +38,21 @@ export function ResumeUploadField() {
     setResumePath(path);
     setFileName(file.name);
     setStatus("idle");
+    onReadyChange(true);
   }
 
   return (
     <div className="field">
-      <label htmlFor="resume_file">
-        Resume / CV <span style={{ fontWeight: 400 }}>(optional — PDF or Word document)</span>
-      </label>
+      <label htmlFor="resume_file">Resume / CV</label>
       <input
         id="resume_file"
         type="file"
         accept=".pdf,.doc,.docx"
+        required
         onChange={handleFile}
       />
       {status === "uploading" && <span className="hint">Uploading…</span>}
-      {status === "error" && <span className="hint">Upload failed — you can still submit without a resume.</span>}
+      {status === "error" && <span className="hint">Upload failed — please choose the file again.</span>}
       {fileName && status === "idle" && <span className="hint">Attached: {fileName}</span>}
       <input type="hidden" name="resume_path" value={resumePath} />
     </div>

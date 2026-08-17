@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ResumeUploadField } from "@/components/ResumeUploadField";
 import { submitApplicationAction, type ApplyFormState } from "@/lib/actions/applications";
@@ -31,6 +31,7 @@ export function ApplyForm({
     submitApplicationAction,
     {}
   );
+  const [resumeReady, setResumeReady] = useState(false);
 
   if (state.success) {
     return (
@@ -80,7 +81,7 @@ export function ApplyForm({
         </div>
       </div>
 
-      <ResumeUploadField />
+      <ResumeUploadField onReadyChange={setResumeReady} />
 
       <div className="checkbox-row">
         <input id="consent" name="consent" type="checkbox" required />
@@ -90,7 +91,7 @@ export function ApplyForm({
         </label>
       </div>
 
-      <SubmitButton>Submit application</SubmitButton>
+      <SubmitButton disabled={!resumeReady}>Submit application</SubmitButton>
     </form>
   );
 }

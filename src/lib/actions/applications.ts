@@ -21,6 +21,9 @@ export async function submitApplicationAction(
   if (!name || !email || !phone) {
     return { error: "Name, email and contact number are required." };
   }
+  if (!resumePath) {
+    return { error: "Please attach your resume/CV." };
+  }
   if (!consent) {
     return { error: "Please confirm you consent to sharing your details with the advertising agency." };
   }
