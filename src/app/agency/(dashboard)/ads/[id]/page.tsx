@@ -42,15 +42,21 @@ export default async function AgencyAdDetailPage({
           homepage shortly.
         </div>
       )}
+      {sp.updated === "1" && <div className="form-success">Ad updated.</div>}
 
-      <div className="section-head">
-        <p className="eyebrow">{ad.country}</p>
-        <h1>{ad.title}</h1>
-        <p>
-          {ad.employer_name ? `${ad.employer_name} · ` : ""}
-          {ad.city ? `${ad.city}, ` : ""}
-          {ad.country} · Posted {formatDate(ad.created_at)}
-        </p>
+      <div className="section-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <p className="eyebrow">{ad.country}</p>
+          <h1>{ad.title}</h1>
+          <p>
+            {ad.employer_name ? `${ad.employer_name} · ` : ""}
+            {ad.city ? `${ad.city}, ` : ""}
+            {ad.country} · Posted {formatDate(ad.created_at)}
+          </p>
+        </div>
+        <Link className="btn btn-ghost btn-sm" href={`/agency/ads/${ad.id}/edit`}>
+          Edit ad
+        </Link>
       </div>
 
       <div className="card" style={{ marginBottom: 24, display: "flex", gap: 24, flexWrap: "wrap" }}>

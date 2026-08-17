@@ -153,6 +153,114 @@ export async function createJobAdAction(
   redirect(`/agency/ads/${ad.id}/pay?payment=${payment.id}`);
 }
 
+export async function updateJobAdAction(
+  _prev: AdFormState,
+  formData: FormData
+): Promise<AdFormState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Please log in again." };
+
+  const adId = String(formData.get("ad_id") || "").trim();
+  if (!adId) return { error: "Missing ad reference." };
+
+  const { data: agency } = await supabase
+    .from("agencies")
+    .select("id")
+    .eq("profile_id", user.id)
+    .single();
+  if (!agency) return { error: "Agency profile not found." };
+
+  const { data: existingAd } = await supabase
+    .from("job_ads")
+    .select("id, agency_id")
+    .eq("id", adId)
+    .single();
+  if (!existingAd || existingAd.agency_id !== agency.id) {
+    return { error: "Ad not found." };
+  }
+
+  const title = String(formData.get("title") || "").trim();
+  const employerName = String(formData.get("employer_name") || "").trim();
+  const country = String(formData.get("country") || "").trim();
+  const city = String(formData.get("city") || "").trim();
+  const description = String(formData.get("description") || "").trim();
+  const contactEmail = String(formData.get("contact_email") || "").trim();
+  const contactName = String(formData.get("contact_name") || "").trim();
+  const contactPhone = String(formData.get("contact_phone") || "").trim();
+  const vacanciesRaw = String(formData.get("vacancies") || "").trim();
+  const imageUrl = String(formData.get("image_url") || "").trim();
+
+  if (!title || !country || !contactEmail) {
+    return { error: "Position title, country, and contact email are required." };
+  }
+  if (!imageUrl) {
+    return { error: "Please upload an ad image — every ad is shown as an image on the homepage." };
+  }
+
+  const { error: adError } = await supabase
+    .from("job_ads")
+    .update({
+      title,
+      employer_name: employerName || null,
+      country,
+      city: city || null,
+      description: description || null,
+      contact_email: contactEmail,
+      contact_name: contactName || null,
+      contact_phone: contactPhone || null,
+      vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
+      image_url: imageUrl || null,
+    })
+    .eq("id", adId);
+
+  if (adError) return { error: adError.message };
+
+  const vacancyTitles = formData.getAll("vac_title").map((v) => String(v).trim());
+  const vacancyCountries = formData.getAll("vac_country").map((v) => String(v).trim());
+  const vacancyCities = formData.getAll("vac_city").map((v) => String(v).trim());
+  const vacancySalaries = formData.getAll("vac_salary").map((v) => String(v).trim());
+  const vacancyCounts = formData.getAll("vac_count").map((v) => String(v).trim());
+  const vacancyDetails = formData.getAll("vac_details").map((v) => String(v).trim());
+
+  const vacancyRows = vacancyTitles
+    .map((vTitle, i) => ({
+      job_ad_id: adId,
+      title: vTitle,
+      country: vacancyCountries[i] || country,
+      city: vacancyCities[i] || city || null,
+      salary_range: vacancySalaries[i] || null,
+      vacancies: vacancyCounts[i] ? Number(vacancyCounts[i]) : null,
+      details: vacancyDetails[i] || null,
+    }))
+    .filter((v) => v.title);
+
+  if (vacancyRows.length === 0) {
+    vacancyRows.push({
+      job_ad_id: adId,
+      title,
+      country,
+      city: city || null,
+      salary_range: null,
+      vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
+      details: description || null,
+    });
+  }
+
+  // Replace the vacancy set. applications.job_vacancy_id is ON DELETE SET NULL, so existing
+  // applications keep all their data (name, resume, position_applied snapshot) -- only the FK
+  // link to a since-changed vacancy row is cleared, never the application itself.
+  const { error: deleteError } = await supabase.from("job_vacancies").delete().eq("job_ad_id", adId);
+  if (deleteError) return { error: deleteError.message };
+
+  const { error: vacError } = await supabase.from("job_vacancies").insert(vacancyRows);
+  if (vacError) return { error: vacError.message };
+
+  redirect(`/agency/ads/${adId}?updated=1`);
+}
+
 export async function confirmMockPaymentAction(
   jobAdId: string,
   paymentId: string,
