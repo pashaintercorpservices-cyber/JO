@@ -80,6 +80,20 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
         <span className="hint">Every application will be emailed here and saved in your dashboard.</span>
       </div>
 
+      <div className="field-row">
+        <div className="field">
+          <label htmlFor="contact_name">Hiring manager / contact person name</label>
+          <input id="contact_name" name="contact_name" type="text" placeholder="e.g. Rahul Menon" />
+        </div>
+        <div className="field">
+          <label htmlFor="contact_phone">Contact phone number</label>
+          <input id="contact_phone" name="contact_phone" type="tel" placeholder="e.g. +91 98765 43210" />
+        </div>
+      </div>
+      <span className="hint" style={{ display: "block", marginTop: -10, marginBottom: 16 }}>
+        Shared with candidates in their application confirmation email, so they can reach you directly.
+      </span>
+
       <ImageUploadField userId={userId} imageUrl={imageUrl} onImageUrlChange={setImageUrl} />
 
       <div className="card" style={{ background: "var(--surface-2)", marginBottom: 16 }}>

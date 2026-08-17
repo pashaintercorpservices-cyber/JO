@@ -132,6 +132,8 @@ export type Database = {
           agency_id: string;
           city: string | null;
           contact_email: string;
+          contact_name: string | null;
+          contact_phone: string | null;
           country: string;
           created_at: string;
           description: string | null;
@@ -154,6 +156,8 @@ export type Database = {
           agency_id: string;
           city?: string | null;
           contact_email: string;
+          contact_name?: string | null;
+          contact_phone?: string | null;
           country: string;
           created_at?: string;
           description?: string | null;

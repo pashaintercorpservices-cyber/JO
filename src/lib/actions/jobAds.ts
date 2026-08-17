@@ -36,6 +36,8 @@ export async function createJobAdAction(
   const city = String(formData.get("city") || "").trim();
   const description = String(formData.get("description") || "").trim();
   const contactEmail = String(formData.get("contact_email") || "").trim();
+  const contactName = String(formData.get("contact_name") || "").trim();
+  const contactPhone = String(formData.get("contact_phone") || "").trim();
   const vacanciesRaw = String(formData.get("vacancies") || "").trim();
   const imageUrl = String(formData.get("image_url") || "").trim();
 
@@ -56,6 +58,8 @@ export async function createJobAdAction(
       city: city || null,
       description: description || null,
       contact_email: contactEmail,
+      contact_name: contactName || null,
+      contact_phone: contactPhone || null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       image_url: imageUrl || null,
     })

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { sendApplicationEmail } from "@/lib/email";
+import { sendApplicationEmail, sendCandidateConfirmationEmail } from "@/lib/email";
 import { getResumeSignedUrl } from "@/lib/resume";
 
 export type ApplyFormState = { error?: string; success?: boolean };
@@ -32,12 +32,23 @@ export async function submitApplicationAction(
 
   const { data: vacancy } = await supabase
     .from("job_vacancies")
-    .select("id, title, job_ad_id, job_ads(id, status, contact_email)")
+    .select(
+      "id, title, job_ad_id, job_ads(id, status, contact_email, contact_name, contact_phone, employer_name)"
+    )
     .eq("id", jobVacancyId)
     .single();
 
   const parentAd = (
-    vacancy as { job_ads?: { id: string; status: string; contact_email: string } } | null
+    vacancy as {
+      job_ads?: {
+        id: string;
+        status: string;
+        contact_email: string;
+        contact_name: string | null;
+        contact_phone: string | null;
+        employer_name: string | null;
+      };
+    } | null
   )?.job_ads;
 
   if (!vacancy || !parentAd || parentAd.status !== "live") {
@@ -72,6 +83,17 @@ export async function submitApplicationAction(
     applicantPhone: phone,
     positionTitle: vacancy.title,
     resumeUrl: resumeLinkForEmail,
+  });
+
+  await sendCandidateConfirmationEmail({
+    to: email,
+    applicantName: name,
+    positionTitle: vacancy.title,
+    employerName: parentAd.employer_name,
+    hasResume: Boolean(resumePath),
+    contactName: parentAd.contact_name,
+    contactEmail: parentAd.contact_email,
+    contactPhone: parentAd.contact_phone,
   });
 
   return { success: true };
