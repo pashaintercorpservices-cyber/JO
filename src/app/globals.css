@@ -67,7 +67,7 @@ header.site {
 }
 .nav-row {
   max-width: 1180px; margin: 0 auto; padding: 0 24px;
-  height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
 .brand { display: flex; align-items: center; gap: 11px; font-family: var(--serif); font-weight: 700; font-size: 20px; }
 .brand-mark {
@@ -176,7 +176,7 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
   position: relative;
   background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 55%, var(--navy-500) 100%);
   color: #fff;
-  padding: 56px 0 92px;
+  padding: 24px 0 60px;
   overflow: hidden;
 }
 .hero-rich::before {
@@ -226,7 +226,7 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .popular-searches a:hover { background: var(--amber-100); }
 
 /* ============ Trust strip ============ */
-.trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 4px 0; }
+.trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 0; }
 .trust-item { display: flex; gap: 12px; align-items: flex-start; }
 .trust-item .ico {
   width: 40px; height: 40px; border-radius: 10px; background: var(--amber-100); color: var(--amber-600);
@@ -257,7 +257,7 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .hiring-banner p { font-size: 13.5px; color: #cfd8ef; max-width: 460px; }
 
 /* ============ Promo banner carousel ============ */
-.promo-carousel { position: relative; border-radius: var(--radius); overflow: hidden; height: 160px; margin-bottom: 32px; }
+.promo-carousel { position: relative; border-radius: var(--radius); overflow: hidden; height: 110px; margin-bottom: 4px; }
 .promo-slide {
   position: absolute; inset: 0; display: flex; align-items: center; padding: 0 32px;
   opacity: 0; transition: opacity 0.6s ease; color: #fff;
@@ -290,7 +290,7 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .section-head p { color: var(--muted); font-size: 15.5px; }
 
 /* ============ Dashboard shell ============ */
-.dash-shell { display: grid; grid-template-columns: 220px 1fr; gap: 0; min-height: calc(100vh - 72px); flex: 1; }
+.dash-shell { display: grid; grid-template-columns: 220px 1fr; gap: 0; min-height: calc(100vh - 60px); flex: 1; }
 .dash-side { border-right: 1px solid var(--border); padding: 24px 16px; background: var(--surface); }
 .dash-side .role-tag {
   font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
@@ -360,4 +360,6 @@ footer.site { border-top: 1px solid var(--border); padding: 40px 0 28px; margin-
   .country-tile-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-search-row { flex-direction: column; }
   .hero-search-row select, .hero-search-row input, .hero-search-row button { width: 100%; }
+  .promo-carousel { height: 175px; }
+  .promo-slide { padding: 0 20px; }
 }
