@@ -54,7 +54,7 @@ export async function SiteHeader() {
         <Link className="brand" href="/">
           <img src="/logo-icon.png" alt="" className="brand-mark" />
           <span className="brand-name">
-            Job<span className="o">Overseas</span>
+            Jobs<span className="o">Overseas</span>
           </span>
         </Link>
         <nav className="primary">

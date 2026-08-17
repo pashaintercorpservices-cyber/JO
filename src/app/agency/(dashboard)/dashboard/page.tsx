@@ -28,7 +28,7 @@ export default async function AgencyDashboardPage() {
         <p className="eyebrow">Agency</p>
         <h1>{user.agency.agency_name}</h1>
         <p>
-          {user.agency.verified ? "Verified agency" : "Verification pending with the JobOverseas team"}
+          {user.agency.verified ? "Verified agency" : "Verification pending with the JobsOverseas team"}
         </p>
       </div>
 

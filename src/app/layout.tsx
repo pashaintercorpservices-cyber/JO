@@ -10,9 +10,9 @@ const brandFont = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "JobOverseas — Advertise the job. Track the hire.",
+  title: "JobsOverseas — Advertise the job. Track the hire.",
   description:
-    "JobOverseas is where licensed overseas recruitment agencies post vacancies and candidates apply, directly.",
+    "JobsOverseas is where licensed overseas recruitment agencies post vacancies and candidates apply, directly.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
