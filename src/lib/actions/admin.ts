@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getCurrentUser } from "@/lib/auth";
 import type { Database } from "@/lib/types";
 
 type AdStatus = Database["public"]["Enums"]["ad_status"];
@@ -14,6 +16,28 @@ async function requireAdmin() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated.");
   return supabase;
+}
+
+async function requireSuperAdmin() {
+  const user = await getCurrentUser();
+  if (!user || !user.profile.is_super_admin) {
+    throw new Error("Only a super admin can do this.");
+  }
+  return user;
+}
+
+// Uses the Auth Admin API (service role), not a table update -- RLS can't gate this,
+// so the super-admin check above is the only thing standing between this and any
+// authenticated user resetting anyone's password. Do not relax requireSuperAdmin here.
+export async function resetUserPasswordAction(targetUserId: string, newPassword: string) {
+  await requireSuperAdmin();
+  if (newPassword.length < 8) throw new Error("Password must be at least 8 characters.");
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(targetUserId, {
+    password: newPassword,
+  });
+  if (error) throw new Error(error.message);
 }
 
 export async function setAdStatusAction(jobAdId: string, status: AdStatus) {

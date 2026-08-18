@@ -20,6 +20,9 @@ export default async function AdminDashboardLayout({
         { href: "/admin/applications", label: "Applications" },
         { href: "/admin/payments", label: "Payments" },
         { href: "/admin/reports", label: "Reports" },
+        ...(user.profile.is_super_admin
+          ? [{ href: "/admin/users", label: "Users" }]
+          : []),
         ...(user.profile.is_super_admin && user.agency
           ? [{ href: "/agency/dashboard", label: "Agency dashboard →" }]
           : []),
