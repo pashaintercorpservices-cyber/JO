@@ -96,6 +96,36 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
 
       <ImageUploadField userId={userId} imageUrl={imageUrl} onImageUrlChange={setImageUrl} />
 
+      <div className="card" style={{ marginBottom: 16 }}>
+        <p style={{ fontWeight: 700, marginBottom: 10, fontSize: 15 }}>Screening preferences</p>
+
+        <div className="checkbox-row">
+          <input id="require_video_intro" name="require_video_intro" type="checkbox" />
+          <label htmlFor="require_video_intro">
+            Require a short 1-2 minute video introduction from candidates (recommended for
+            senior positions)
+          </label>
+        </div>
+
+        <div className="field" style={{ marginTop: 12, marginBottom: 0 }}>
+          <label htmlFor="min_match_score">
+            Only email me applications that score at least this % match to the vacancy
+          </label>
+          <input
+            id="min_match_score"
+            name="min_match_score"
+            type="number"
+            min={0}
+            max={100}
+            placeholder="Leave blank to receive every application"
+          />
+          <span className="hint">
+            Every application is still saved to your dashboard either way — this only controls
+            which ones get emailed to you directly.
+          </span>
+        </div>
+      </div>
+
       <div className="card" style={{ background: "var(--surface-2)", marginBottom: 16 }}>
         <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>
         <p style={{ fontSize: 13.5, color: "var(--muted)" }}>

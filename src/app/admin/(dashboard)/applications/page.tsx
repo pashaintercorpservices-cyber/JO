@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getResumeSignedUrl } from "@/lib/resume";
+import { getVideoIntroSignedUrl } from "@/lib/video";
 import { formatDate } from "@/lib/format";
 import { ApplicationDeleteButton } from "./ApplicationDeleteButton";
 
@@ -26,14 +27,21 @@ export default async function AdminApplicationsPage({
   const { data: applications } = await query;
 
   const resumeLinks = new Map<string, string>();
-  await Promise.all(
-    (applications || [])
+  const videoLinks = new Map<string, string>();
+  await Promise.all([
+    ...(applications || [])
       .filter((a) => a.resume_url)
       .map(async (a) => {
         const url = await getResumeSignedUrl(a.resume_url!);
         if (url) resumeLinks.set(a.id, url);
-      })
-  );
+      }),
+    ...(applications || [])
+      .filter((a) => a.video_intro_url)
+      .map(async (a) => {
+        const url = await getVideoIntroSignedUrl(a.video_intro_url!);
+        if (url) videoLinks.set(a.id, url);
+      }),
+  ]);
 
   return (
     <>
@@ -68,15 +76,17 @@ export default async function AdminApplicationsPage({
           <table className="data table-flexible">
             <thead>
               <tr>
-                <th style={{ width: "13%" }}>Name</th>
-                <th style={{ width: "17%" }}>Email</th>
-                <th style={{ width: "10%" }}>Phone</th>
-                <th style={{ width: "20%" }}>Position</th>
-                <th style={{ width: "14%" }}>Agency</th>
-                <th style={{ width: "7%" }}>Resume</th>
-                <th style={{ width: "8%" }}>Source</th>
-                <th style={{ width: "11%" }}>Received</th>
-                {canDelete && <th style={{ width: "8%" }}></th>}
+                <th style={{ width: "11%" }}>Name</th>
+                <th style={{ width: "14%" }}>Email</th>
+                <th style={{ width: "9%" }}>Phone</th>
+                <th style={{ width: "16%" }}>Position</th>
+                <th style={{ width: "11%" }}>Agency</th>
+                <th style={{ width: "7%" }}>Match</th>
+                <th style={{ width: "6%" }}>Resume</th>
+                <th style={{ width: "6%" }}>Video</th>
+                <th style={{ width: "7%" }}>Source</th>
+                <th style={{ width: "9%" }}>Received</th>
+                {canDelete && <th style={{ width: "6%" }}></th>}
               </tr>
             </thead>
             <tbody>
@@ -97,9 +107,30 @@ export default async function AdminApplicationsPage({
                     </td>
                     <td>{jobAd?.agencies?.agency_name ?? "—"}</td>
                     <td>
+                      {app.match_score != null ? (
+                        <span
+                          className={`badge ${app.match_score >= 70 ? "badge-live" : app.match_score >= 40 ? "badge-pending" : "badge-rejected"}`}
+                          title={app.match_summary ?? undefined}
+                        >
+                          {app.match_score}%
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
                       {resumeLinks.has(app.id) ? (
                         <a href={resumeLinks.get(app.id)} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
                           View
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
+                      {videoLinks.has(app.id) ? (
+                        <a href={videoLinks.get(app.id)} target="_blank" rel="noreferrer" style={{ color: "var(--amber-600)", fontWeight: 700 }}>
+                          Watch
                         </a>
                       ) : (
                         "—"

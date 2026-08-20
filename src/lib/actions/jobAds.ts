@@ -40,6 +40,11 @@ export async function createJobAdAction(
   const contactPhone = String(formData.get("contact_phone") || "").trim();
   const vacanciesRaw = String(formData.get("vacancies") || "").trim();
   const imageUrl = String(formData.get("image_url") || "").trim();
+  const requireVideoIntro = formData.get("require_video_intro") === "on";
+  const minMatchScoreRaw = String(formData.get("min_match_score") || "").trim();
+  const minMatchScore = minMatchScoreRaw
+    ? Math.max(0, Math.min(100, Number(minMatchScoreRaw)))
+    : null;
 
   if (!title || !country || !contactEmail) {
     return { error: "Position title, country, and contact email are required." };
@@ -62,6 +67,8 @@ export async function createJobAdAction(
       contact_phone: contactPhone || null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       image_url: imageUrl || null,
+      require_video_intro: requireVideoIntro,
+      min_match_score: minMatchScore,
     })
     .select("id")
     .single();
@@ -192,6 +199,11 @@ export async function updateJobAdAction(
   const contactPhone = String(formData.get("contact_phone") || "").trim();
   const vacanciesRaw = String(formData.get("vacancies") || "").trim();
   const imageUrl = String(formData.get("image_url") || "").trim();
+  const requireVideoIntro = formData.get("require_video_intro") === "on";
+  const minMatchScoreRaw = String(formData.get("min_match_score") || "").trim();
+  const minMatchScore = minMatchScoreRaw
+    ? Math.max(0, Math.min(100, Number(minMatchScoreRaw)))
+    : null;
 
   if (!title || !country || !contactEmail) {
     return { error: "Position title, country, and contact email are required." };
@@ -213,6 +225,8 @@ export async function updateJobAdAction(
       contact_phone: contactPhone || null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       image_url: imageUrl || null,
+      require_video_intro: requireVideoIntro,
+      min_match_score: minMatchScore,
     })
     .eq("id", adId);
 

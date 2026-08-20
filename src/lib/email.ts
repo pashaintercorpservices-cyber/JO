@@ -72,8 +72,12 @@ export async function sendApplicationEmail(params: {
   positionTitle: string;
   resumeUrl?: string;
   suitabilityAnswer?: string;
+  matchScore?: number | null;
+  matchSummary?: string | null;
+  videoIntroUrl?: string;
 }) {
-  const subject = `Application: ${params.applicantName} - ${params.positionTitle} | JobsOverseas.in`;
+  const scoreTag = params.matchScore != null ? ` (${params.matchScore}% match)` : "";
+  const subject = `Application: ${params.applicantName} - ${params.positionTitle}${scoreTag} | JobsOverseas.in`;
   const text = [
     "Dear Sir/Madam,",
     "",
@@ -84,10 +88,14 @@ export async function sendApplicationEmail(params: {
     `Candidate Name: ${params.applicantName}`,
     `Email: ${params.applicantEmail}`,
     `Phone: ${params.applicantPhone}`,
+    ...(params.matchScore != null
+      ? ["", `JD match score: ${params.matchScore}%${params.matchSummary ? ` -- ${params.matchSummary}` : ""}`]
+      : []),
     "",
     params.resumeUrl
       ? `Resume: Please access the candidate's CV through the link below.\n${params.resumeUrl}`
       : "Resume: not attached",
+    ...(params.videoIntroUrl ? ["", `Video introduction: ${params.videoIntroUrl}`] : []),
     ...(params.suitabilityAnswer
       ? ["", `Why the candidate feels suitable: ${params.suitabilityAnswer}`]
       : []),
@@ -105,12 +113,22 @@ export async function sendApplicationEmail(params: {
       <strong>Candidate Name:</strong> ${escapeHtml(params.applicantName)}<br>
       <strong>Email:</strong> ${escapeHtml(params.applicantEmail)}<br>
       <strong>Phone:</strong> ${escapeHtml(params.applicantPhone)}
+      ${
+        params.matchScore != null
+          ? `<br><strong>JD match score:</strong> <span style="color:#f2861b; font-weight:bold;">${params.matchScore}%</span>${params.matchSummary ? ` — ${escapeHtml(params.matchSummary)}` : ""}`
+          : ""
+      }
     </p>
     <p style="margin:0 0 16px;">${
       params.resumeUrl
         ? `<a href="${escapeHtml(params.resumeUrl)}" style="display:inline-block; background:#f2861b; color:#241000; font-weight:bold; text-decoration:none; padding:10px 18px; border-radius:6px;">View Candidate Resume</a>`
         : "Resume: not attached"
     }</p>
+    ${
+      params.videoIntroUrl
+        ? `<p style="margin:0 0 16px;"><a href="${escapeHtml(params.videoIntroUrl)}" style="display:inline-block; background:#0a1f4a; color:#fff; font-weight:bold; text-decoration:none; padding:10px 18px; border-radius:6px;">Watch Video Introduction</a></p>`
+        : ""
+    }
     ${
       params.suitabilityAnswer
         ? `<p style="margin:0 0 16px; padding:14px 16px; background:#eef2f9; border-radius:8px;"><strong>Why the candidate feels suitable:</strong><br>${escapeHtml(params.suitabilityAnswer)}</p>`

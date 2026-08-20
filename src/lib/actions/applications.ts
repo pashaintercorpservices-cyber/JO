@@ -1,8 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sendApplicationEmail, sendCandidateConfirmationEmail } from "@/lib/email";
 import { getResumeSignedUrl } from "@/lib/resume";
+import { getVideoIntroSignedUrl } from "@/lib/video";
+import { extractResumeText, scoreResumeMatch } from "@/lib/matching";
 
 export type ApplyFormState = { error?: string; success?: boolean };
 
@@ -18,6 +21,8 @@ export async function submitApplicationAction(
   const consent = formData.get("consent") === "on";
   const suitabilityAnswer = String(formData.get("suitability_answer") || "").trim();
   const resumeConfirmed = formData.get("resume_confirmed") === "on";
+  const videoIntroPath = String(formData.get("video_intro_path") || "").trim();
+  const videoIntroSecondsRaw = String(formData.get("video_intro_seconds") || "").trim();
 
   if (!jobVacancyId) return { error: "Select the vacancy you're applying for." };
   if (!name || !email || !phone) {
@@ -44,7 +49,7 @@ export async function submitApplicationAction(
   const { data: vacancy } = await supabase
     .from("job_vacancies")
     .select(
-      "id, title, job_ad_id, job_ads(id, status, contact_email, contact_name, contact_phone, employer_name)"
+      "id, title, details, job_ad_id, job_ads(id, status, contact_email, contact_name, contact_phone, employer_name, require_video_intro, min_match_score)"
     )
     .eq("id", jobVacancyId)
     .single();
@@ -58,12 +63,45 @@ export async function submitApplicationAction(
         contact_name: string | null;
         contact_phone: string | null;
         employer_name: string | null;
+        require_video_intro: boolean;
+        min_match_score: number | null;
       };
     } | null
   )?.job_ads;
 
   if (!vacancy || !parentAd || parentAd.status !== "live") {
     return { error: "This vacancy is no longer accepting applications." };
+  }
+
+  // Server-side enforcement -- the client hides/shows the recorder based on this same
+  // flag, but that's a UI convenience only, not the actual gate.
+  if (parentAd.require_video_intro && !videoIntroPath) {
+    return { error: "This vacancy requires a short video introduction — please record one before submitting." };
+  }
+
+  // Best-effort JD match scoring. Never blocks submission -- if the resume can't be
+  // read, or ANTHROPIC_API_KEY isn't configured, the application still goes through
+  // with match_score left null.
+  let matchScore: number | null = null;
+  let matchSummary: string | null = null;
+  try {
+    const admin = createAdminClient();
+    const { data: resumeBlob } = await admin.storage.from("resumes").download(resumePath);
+    if (resumeBlob) {
+      const bytes = Buffer.from(await resumeBlob.arrayBuffer());
+      const resumeText = await extractResumeText(bytes, resumePath);
+      const result = await scoreResumeMatch({
+        resumeText,
+        positionTitle: vacancy.title,
+        jobDetails: vacancy.details || "",
+      });
+      if (result) {
+        matchScore = result.score;
+        matchSummary = result.summary;
+      }
+    }
+  } catch (err) {
+    console.error("[applications:match-scoring-failed]", err);
   }
 
   const { error } = await supabase.from("applications").insert({
@@ -79,25 +117,43 @@ export async function submitApplicationAction(
     consent: true,
     suitability_answer: suitabilityAnswer,
     resume_confirmed: resumeConfirmed,
+    match_score: matchScore,
+    match_summary: matchSummary,
+    video_intro_url: videoIntroPath || null,
+    video_intro_seconds: videoIntroSecondsRaw ? Number(videoIntroSecondsRaw) : null,
   });
 
   if (error) return { error: error.message };
 
-  // 30-day link embedded in the one-time notification email; the agency dashboard/admin
+  // 30-day links embedded in the one-time notification email; the agency dashboard/admin
   // views generate their own fresh short-lived link each time instead of reusing this one.
   const resumeLinkForEmail = resumePath
     ? (await getResumeSignedUrl(resumePath, 60 * 60 * 24 * 30)) ?? undefined
     : undefined;
+  const videoLinkForEmail = videoIntroPath
+    ? (await getVideoIntroSignedUrl(videoIntroPath, 60 * 60 * 24 * 30)) ?? undefined
+    : undefined;
 
-  await sendApplicationEmail({
-    to: parentAd.contact_email,
-    applicantName: name,
-    applicantEmail: email,
-    applicantPhone: phone,
-    positionTitle: vacancy.title,
-    resumeUrl: resumeLinkForEmail,
-    suitabilityAnswer,
-  });
+  // Agency's own screening preference: only forward applications at/above their
+  // threshold. Fails open (still sends) when scoring wasn't available at all, so a
+  // configuration gap never silently hides a real candidate.
+  const meetsAgencyThreshold =
+    parentAd.min_match_score == null || matchScore == null || matchScore >= parentAd.min_match_score;
+
+  if (meetsAgencyThreshold) {
+    await sendApplicationEmail({
+      to: parentAd.contact_email,
+      applicantName: name,
+      applicantEmail: email,
+      applicantPhone: phone,
+      positionTitle: vacancy.title,
+      resumeUrl: resumeLinkForEmail,
+      suitabilityAnswer,
+      matchScore,
+      matchSummary,
+      videoIntroUrl: videoLinkForEmail,
+    });
+  }
 
   await sendCandidateConfirmationEmail({
     to: email,

@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ResumeUploadField, type ResumePreview } from "@/components/ResumeUploadField";
 import { ResumePreviewCard } from "@/components/ResumePreviewCard";
+import { VideoIntroRecorder } from "@/components/VideoIntroRecorder";
 import { submitApplicationAction, type ApplyFormState } from "@/lib/actions/applications";
 
 type Prefill = { name?: string; email?: string; phone?: string };
@@ -13,6 +14,7 @@ type VacancyOption = {
   country: string;
   city?: string | null;
   salary_range?: string | null;
+  requireVideoIntro: boolean;
 };
 
 function vacancyLabel(v: VacancyOption): string {
@@ -34,8 +36,15 @@ export function ApplyForm({
   );
   const [resumeReady, setResumeReady] = useState(false);
   const [resumeFile, setResumeFile] = useState<ResumePreview | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [selectedVacancyId, setSelectedVacancyId] = useState(
+    vacancies.length === 1 ? vacancies[0].id : ""
+  );
   const [step, setStep] = useState<1 | 2>(1);
   const step1Ref = useRef<HTMLDivElement>(null);
+
+  const selectedVacancy = vacancies.find((v) => v.id === selectedVacancyId);
+  const videoRequired = Boolean(selectedVacancy?.requireVideoIntro);
 
   if (state.success) {
     return (
@@ -61,6 +70,8 @@ export function ApplyForm({
     if (allValid) setStep(2);
   }
 
+  const canContinue = resumeReady && (!videoRequired || videoReady);
+
   return (
     <form action={formAction}>
       {state.error && <div className="form-error">{state.error}</div>}
@@ -72,7 +83,8 @@ export function ApplyForm({
             id="job_vacancy_id"
             name="job_vacancy_id"
             required
-            defaultValue={vacancies.length === 1 ? vacancies[0].id : ""}
+            value={selectedVacancyId}
+            onChange={(e) => setSelectedVacancyId(e.target.value)}
           >
             {vacancies.length !== 1 && (
               <option value="" disabled>
@@ -104,6 +116,14 @@ export function ApplyForm({
 
         <ResumeUploadField onReadyChange={setResumeReady} onFileSelected={setResumeFile} />
 
+        {videoRequired && (
+          <VideoIntroRecorder
+            key={selectedVacancyId}
+            onReadyChange={setVideoReady}
+            onVideoSelected={() => {}}
+          />
+        )}
+
         <div className="checkbox-row">
           <input id="consent" name="consent" type="checkbox" required />
           <label htmlFor="consent">
@@ -115,7 +135,7 @@ export function ApplyForm({
         <button
           type="button"
           className="btn btn-primary btn-block"
-          disabled={!resumeReady}
+          disabled={!canContinue}
           onClick={handleContinue}
         >
           Continue to review →

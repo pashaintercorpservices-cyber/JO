@@ -78,6 +78,8 @@ export type Database = {
           id: string;
           job_ad_id: string;
           job_vacancy_id: string | null;
+          match_score: number | null;
+          match_summary: string | null;
           name: string;
           phone: string;
           position_applied: string;
@@ -85,6 +87,8 @@ export type Database = {
           resume_url: string | null;
           source: "guest" | "account";
           suitability_answer: string | null;
+          video_intro_seconds: number | null;
+          video_intro_url: string | null;
         };
         Insert: {
           applicant_profile_id?: string | null;
@@ -94,6 +98,8 @@ export type Database = {
           id?: string;
           job_ad_id: string;
           job_vacancy_id?: string | null;
+          match_score?: number | null;
+          match_summary?: string | null;
           name: string;
           phone: string;
           position_applied: string;
@@ -101,6 +107,8 @@ export type Database = {
           resume_url?: string | null;
           source?: "guest" | "account";
           suitability_answer?: string | null;
+          video_intro_seconds?: number | null;
+          video_intro_url?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["applications"]["Insert"]>;
         Relationships: [];
@@ -144,8 +152,10 @@ export type Database = {
           employer_name: string | null;
           id: string;
           image_url: string | null;
+          min_match_score: number | null;
           promo_status: "not_started" | "scheduled" | "running" | "completed";
           published_at: string | null;
+          require_video_intro: boolean;
           status:
             | "pending_payment"
             | "pending_approval"
@@ -168,8 +178,10 @@ export type Database = {
           employer_name?: string | null;
           id?: string;
           image_url?: string | null;
+          min_match_score?: number | null;
           promo_status?: "not_started" | "scheduled" | "running" | "completed";
           published_at?: string | null;
+          require_video_intro?: boolean;
           status?:
             | "pending_payment"
             | "pending_approval"
