@@ -10,10 +10,12 @@ export async function extractResumeText(bytes: Buffer, fileName: string): Promis
   const lower = fileName.toLowerCase();
   try {
     if (lower.endsWith(".pdf")) {
-      const { PDFParse } = await import("pdf-parse");
-      const parser = new PDFParse({ data: bytes });
-      const result = await parser.getText();
-      await parser.destroy();
+      // unpdf ships a serverless build of PDF.js with no native canvas dependency --
+      // pdf-parse's default pdfjs-dist build needs DOMMatrix/canvas that Vercel's
+      // serverless runtime doesn't provide, which silently broke extraction there.
+      const { extractText, getDocumentProxy } = await import("unpdf");
+      const pdf = await getDocumentProxy(new Uint8Array(bytes));
+      const result = await extractText(pdf, { mergePages: true });
       return result.text.slice(0, 15000);
     }
     if (lower.endsWith(".docx")) {
