@@ -65,18 +65,18 @@ export default async function AdminApplicationsPage({
         <div className="empty-state">No applications found.</div>
       ) : (
         <div className="table-wrap">
-          <table className="data">
+          <table className="data table-flexible">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Position</th>
-                <th>Agency</th>
-                <th>Resume</th>
-                <th>Source</th>
-                <th>Received</th>
-                {canDelete && <th></th>}
+                <th style={{ width: "13%" }}>Name</th>
+                <th style={{ width: "17%" }}>Email</th>
+                <th style={{ width: "10%" }}>Phone</th>
+                <th style={{ width: "20%" }}>Position</th>
+                <th style={{ width: "14%" }}>Agency</th>
+                <th style={{ width: "7%" }}>Resume</th>
+                <th style={{ width: "8%" }}>Source</th>
+                <th style={{ width: "11%" }}>Received</th>
+                {canDelete && <th style={{ width: "8%" }}></th>}
               </tr>
             </thead>
             <tbody>

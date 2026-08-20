@@ -6,11 +6,13 @@ import { BannerCarousel } from "@/components/BannerCarousel";
 import { COUNTRIES, COUNTRY_FLAGS } from "@/lib/format";
 
 const POPULAR_SEARCHES = ["Welder", "Electrician", "Driver", "HVAC Technician", "Nurse", "Site Supervisor"];
+const ADS_PER_PAGE = 16;
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
   const country = typeof sp.country === "string" ? sp.country : undefined;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const requestedPage = typeof sp.page === "string" ? parseInt(sp.page, 10) : 1;
 
   const supabase = await createClient();
 
@@ -59,6 +61,31 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
     if (country) query = query.eq("country", country);
     const { data } = await query;
     ads = data || [];
+  }
+
+  // Open positions = sum of each job category's position count, not the number of ad
+  // postings -- one ad can advertise several categories (e.g. "Welder x5, Electrician x3").
+  const adIds = ads.map((a) => a.id);
+  let totalOpenPositions = 0;
+  if (adIds.length > 0) {
+    const { data: vacancyCounts } = await supabase
+      .from("job_vacancies")
+      .select("vacancies")
+      .in("job_ad_id", adIds);
+    totalOpenPositions = (vacancyCounts || []).reduce((sum, v) => sum + (v.vacancies ?? 1), 0);
+  }
+
+  const totalPages = Math.max(1, Math.ceil(ads.length / ADS_PER_PAGE));
+  const currentPage = Math.min(Math.max(1, requestedPage || 1), totalPages);
+  const pagedAds = ads.slice((currentPage - 1) * ADS_PER_PAGE, currentPage * ADS_PER_PAGE);
+
+  function pageHref(page: number): string {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (country) params.set("country", country);
+    if (page > 1) params.set("page", String(page));
+    const qs = params.toString();
+    return qs ? `/?${qs}` : "/";
   }
 
   // Real, unfiltered counts for the country tiles -- honest numbers only, no placeholders.
@@ -172,7 +199,7 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 Live right now{country ? ` · ${country}` : ""}
                 {q ? ` · "${q}"` : ""}
               </p>
-              <h2 style={{ margin: "6px 0 0", fontSize: 24 }}>{ads.length} open vacancies</h2>
+              <h2 style={{ margin: "6px 0 0", fontSize: 24 }}>{totalOpenPositions} open vacancies</h2>
             </div>
             {(country || q) && (
               <Link className="btn btn-ghost btn-sm" href="/">
@@ -190,11 +217,42 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                   : "No live vacancies yet — check back soon."}
             </div>
           ) : (
-            <div className="ad-grid">
-              {ads.map((ad) => (
-                <AdTile key={ad.id} ad={ad} />
-              ))}
-            </div>
+            <>
+              <div className="ad-grid">
+                {pagedAds.map((ad) => (
+                  <AdTile key={ad.id} ad={ad} />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <nav className="pagination" aria-label="Ad listing pages">
+                  {currentPage === 1 ? (
+                    <span className="btn btn-ghost btn-sm pagination-disabled">← Prev</span>
+                  ) : (
+                    <Link href={pageHref(currentPage - 1)} className="btn btn-ghost btn-sm">
+                      ← Prev
+                    </Link>
+                  )}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Link
+                      key={page}
+                      href={pageHref(page)}
+                      className={`pagination-page ${page === currentPage ? "active" : ""}`}
+                      aria-current={page === currentPage ? "page" : undefined}
+                    >
+                      {page}
+                    </Link>
+                  ))}
+                  {currentPage === totalPages ? (
+                    <span className="btn btn-ghost btn-sm pagination-disabled">Next →</span>
+                  ) : (
+                    <Link href={pageHref(currentPage + 1)} className="btn btn-ghost btn-sm">
+                      Next →
+                    </Link>
+                  )}
+                </nav>
+              )}
+            </>
           )}
 
           {countriesWithAds.length > 0 && (

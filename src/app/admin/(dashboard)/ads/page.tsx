@@ -42,12 +42,23 @@ export default async function AdminAdsPage() {
               <tbody>
                 {pending.map((ad) => (
                   <tr key={ad.id}>
-                    <td style={{ fontWeight: 700 }}>
-                      <Link href={`/admin/ads/${ad.id}`} style={{ color: "var(--amber-600)" }}>
+                    <td style={{ fontWeight: 700, maxWidth: 240 }}>
+                      <Link
+                        href={`/admin/ads/${ad.id}`}
+                        title={ad.title}
+                        style={{
+                          color: "var(--amber-600)",
+                          display: "block",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
                         {ad.title}
                       </Link>
                     </td>
-                    <td>{(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}</td>
+                    <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}
+                    </td>
                     <td>{ad.country}</td>
                     <td>{formatDate(ad.created_at)}</td>
                     <td>
@@ -80,12 +91,23 @@ export default async function AdminAdsPage() {
             <tbody>
               {rest.map((ad) => (
                 <tr key={ad.id}>
-                  <td style={{ fontWeight: 700 }}>
-                    <Link href={`/admin/ads/${ad.id}`} style={{ color: "var(--amber-600)" }}>
+                  <td style={{ fontWeight: 700, maxWidth: 240 }}>
+                    <Link
+                      href={`/admin/ads/${ad.id}`}
+                      title={ad.title}
+                      style={{
+                        color: "var(--amber-600)",
+                        display: "block",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {ad.title}
                     </Link>
                   </td>
-                  <td>{(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}</td>
+                  <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}
+                  </td>
                   <td>{ad.country}</td>
                   <td>
                     <span className={`badge ${STATUS_BADGE_CLASS[ad.status]}`}>

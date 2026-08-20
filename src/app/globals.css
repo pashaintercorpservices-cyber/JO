@@ -246,6 +246,18 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .trust-item h4 { font-size: 13.5px; margin-bottom: 3px; }
 .trust-item p { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
 
+/* ============ Pagination ============ */
+.pagination { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 28px; }
+.pagination-disabled { opacity: 0.4; pointer-events: none; }
+.pagination-page {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 36px; padding: 0 4px; border-radius: 9px;
+  font-size: 13.5px; font-weight: 700; color: var(--navy-900);
+  border: 1px solid var(--border);
+}
+.pagination-page:hover { border-color: var(--navy-500); }
+.pagination-page.active { background: var(--navy-900); color: #fff; border-color: var(--navy-900); }
+
 /* ============ Country tiles ============ */
 .country-tile-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 40px; }
 .country-tile {
@@ -323,6 +335,12 @@ table.data { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 table.data th, table.data td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
 table.data th { background: var(--surface-2); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
 table.data tr:last-child td { border-bottom: none; }
+
+/* For tables with many columns of long free text (emails, names) -- wraps cell content
+   and uses a fixed layout so columns share the full width instead of forcing a
+   horizontal scrollbar. */
+table.data.table-flexible { table-layout: fixed; }
+table.data.table-flexible th, table.data.table-flexible td { white-space: normal; word-break: break-word; }
 
 /* ============ Stat tiles ============ */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }

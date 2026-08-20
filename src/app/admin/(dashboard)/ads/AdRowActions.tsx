@@ -13,7 +13,7 @@ export function AdRowActions({
   canDelete?: boolean;
 }) {
   return (
-    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+    <div style={{ display: "flex", gap: 6, flexWrap: "nowrap" }}>
       {status === "pending_payment" && (
         <AdminActionButton
           label="Confirm payment received"
