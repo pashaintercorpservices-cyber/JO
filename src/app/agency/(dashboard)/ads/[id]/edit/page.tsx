@@ -14,7 +14,7 @@ export default async function EditAdPage({ params }: PageProps<"/agency/ads/[id]
 
   const { data: vacancies } = await supabase
     .from("job_vacancies")
-    .select("title, country, city, salary_range, vacancies, details")
+    .select("title, country, city, salary_range, vacancies, details, require_video_intro")
     .eq("job_ad_id", id)
     .order("created_at", { ascending: true });
 

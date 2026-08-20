@@ -40,7 +40,6 @@ export async function createJobAdAction(
   const contactPhone = String(formData.get("contact_phone") || "").trim();
   const vacanciesRaw = String(formData.get("vacancies") || "").trim();
   const imageUrl = String(formData.get("image_url") || "").trim();
-  const requireVideoIntro = formData.get("require_video_intro") === "on";
   const minMatchScoreRaw = String(formData.get("min_match_score") || "").trim();
   const minMatchScore = minMatchScoreRaw
     ? Math.max(0, Math.min(100, Number(minMatchScoreRaw)))
@@ -67,7 +66,6 @@ export async function createJobAdAction(
       contact_phone: contactPhone || null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       image_url: imageUrl || null,
-      require_video_intro: requireVideoIntro,
       min_match_score: minMatchScore,
     })
     .select("id")
@@ -81,6 +79,7 @@ export async function createJobAdAction(
   const vacancySalaries = formData.getAll("vac_salary").map((v) => String(v).trim());
   const vacancyCounts = formData.getAll("vac_count").map((v) => String(v).trim());
   const vacancyDetails = formData.getAll("vac_details").map((v) => String(v).trim());
+  const vacancyRequireVideo = formData.getAll("vac_require_video").map((v) => v === "true");
 
   const vacancyRows = vacancyTitles
     .map((vTitle, i) => ({
@@ -91,6 +90,7 @@ export async function createJobAdAction(
       salary_range: vacancySalaries[i] || null,
       vacancies: vacancyCounts[i] ? Number(vacancyCounts[i]) : null,
       details: vacancyDetails[i] || null,
+      require_video_intro: vacancyRequireVideo[i] ?? false,
     }))
     .filter((v) => v.title);
 
@@ -103,6 +103,7 @@ export async function createJobAdAction(
       salary_range: null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       details: description || null,
+      require_video_intro: vacancyRequireVideo[0] ?? false,
     });
   }
 
@@ -199,7 +200,6 @@ export async function updateJobAdAction(
   const contactPhone = String(formData.get("contact_phone") || "").trim();
   const vacanciesRaw = String(formData.get("vacancies") || "").trim();
   const imageUrl = String(formData.get("image_url") || "").trim();
-  const requireVideoIntro = formData.get("require_video_intro") === "on";
   const minMatchScoreRaw = String(formData.get("min_match_score") || "").trim();
   const minMatchScore = minMatchScoreRaw
     ? Math.max(0, Math.min(100, Number(minMatchScoreRaw)))
@@ -225,7 +225,6 @@ export async function updateJobAdAction(
       contact_phone: contactPhone || null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       image_url: imageUrl || null,
-      require_video_intro: requireVideoIntro,
       min_match_score: minMatchScore,
     })
     .eq("id", adId);
@@ -238,6 +237,7 @@ export async function updateJobAdAction(
   const vacancySalaries = formData.getAll("vac_salary").map((v) => String(v).trim());
   const vacancyCounts = formData.getAll("vac_count").map((v) => String(v).trim());
   const vacancyDetails = formData.getAll("vac_details").map((v) => String(v).trim());
+  const vacancyRequireVideo = formData.getAll("vac_require_video").map((v) => v === "true");
 
   const vacancyRows = vacancyTitles
     .map((vTitle, i) => ({
@@ -248,6 +248,7 @@ export async function updateJobAdAction(
       salary_range: vacancySalaries[i] || null,
       vacancies: vacancyCounts[i] ? Number(vacancyCounts[i]) : null,
       details: vacancyDetails[i] || null,
+      require_video_intro: vacancyRequireVideo[i] ?? false,
     }))
     .filter((v) => v.title);
 
@@ -260,6 +261,7 @@ export async function updateJobAdAction(
       salary_range: null,
       vacancies: vacanciesRaw ? Number(vacanciesRaw) : null,
       details: description || null,
+      require_video_intro: vacancyRequireVideo[0] ?? false,
     });
   }
 

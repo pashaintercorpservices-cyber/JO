@@ -28,8 +28,9 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
         </p>
         <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>
           If your flyer lists several roles (e.g. Welders, Fitters, Electricians), click below to
-          add each one with its own location and salary — candidates will be able to search and
-          apply for the exact position. Leave this empty to use the title above as the only vacancy.
+          add each one with its own location, salary, and video-intro requirement — candidates
+          will be able to search and apply for the exact position. Leave this empty to use the
+          title above as the only vacancy.
         </p>
         <VacancyRepeater />
       </div>
@@ -98,16 +99,12 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
 
       <div className="card" style={{ marginBottom: 16 }}>
         <p style={{ fontWeight: 700, marginBottom: 10, fontSize: 15 }}>Screening preferences</p>
+        <p className="hint" style={{ marginBottom: 12 }}>
+          The video-intro requirement is now set per position, above — check it for senior roles
+          and leave it unchecked for junior ones.
+        </p>
 
-        <div className="checkbox-row">
-          <input id="require_video_intro" name="require_video_intro" type="checkbox" />
-          <label htmlFor="require_video_intro">
-            Require a short 1-2 minute video introduction from candidates (recommended for
-            senior positions)
-          </label>
-        </div>
-
-        <div className="field" style={{ marginTop: 12, marginBottom: 0 }}>
+        <div className="field" style={{ marginBottom: 0 }}>
           <label htmlFor="min_match_score">
             Only email me applications that score at least this % match to the vacancy
           </label>

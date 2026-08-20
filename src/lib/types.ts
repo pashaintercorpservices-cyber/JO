@@ -121,6 +121,7 @@ export type Database = {
           details: string | null;
           id: string;
           job_ad_id: string;
+          require_video_intro: boolean;
           salary_range: string | null;
           title: string;
           vacancies: number | null;
@@ -132,6 +133,7 @@ export type Database = {
           details?: string | null;
           id?: string;
           job_ad_id: string;
+          require_video_intro?: boolean;
           salary_range?: string | null;
           title: string;
           vacancies?: number | null;
@@ -155,7 +157,6 @@ export type Database = {
           min_match_score: number | null;
           promo_status: "not_started" | "scheduled" | "running" | "completed";
           published_at: string | null;
-          require_video_intro: boolean;
           status:
             | "pending_payment"
             | "pending_approval"
@@ -181,7 +182,6 @@ export type Database = {
           min_match_score?: number | null;
           promo_status?: "not_started" | "scheduled" | "running" | "completed";
           published_at?: string | null;
-          require_video_intro?: boolean;
           status?:
             | "pending_payment"
             | "pending_approval"

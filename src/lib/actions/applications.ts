@@ -49,7 +49,7 @@ export async function submitApplicationAction(
   const { data: vacancy } = await supabase
     .from("job_vacancies")
     .select(
-      "id, title, details, job_ad_id, job_ads(id, status, contact_email, contact_name, contact_phone, employer_name, require_video_intro, min_match_score)"
+      "id, title, details, job_ad_id, require_video_intro, job_ads(id, status, contact_email, contact_name, contact_phone, employer_name, min_match_score)"
     )
     .eq("id", jobVacancyId)
     .single();
@@ -63,7 +63,6 @@ export async function submitApplicationAction(
         contact_name: string | null;
         contact_phone: string | null;
         employer_name: string | null;
-        require_video_intro: boolean;
         min_match_score: number | null;
       };
     } | null
@@ -75,7 +74,7 @@ export async function submitApplicationAction(
 
   // Server-side enforcement -- the client hides/shows the recorder based on this same
   // flag, but that's a UI convenience only, not the actual gate.
-  if (parentAd.require_video_intro && !videoIntroPath) {
+  if (vacancy.require_video_intro && !videoIntroPath) {
     return { error: "This vacancy requires a short video introduction — please record one before submitting." };
   }
 

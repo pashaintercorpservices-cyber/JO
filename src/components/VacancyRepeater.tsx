@@ -10,6 +10,7 @@ export type VacancyInitial = {
   salary_range?: string | null;
   vacancies?: number | null;
   details?: string | null;
+  require_video_intro?: boolean | null;
 };
 
 type Row = { key: number } & VacancyInitial;
@@ -21,6 +22,10 @@ export function VacancyRepeater({ initial }: { initial?: VacancyInitial[] }) {
       : [{ key: 0, title: "" }]
   );
   const [nextKey, setNextKey] = useState(rows.length);
+
+  function toggleRequireVideo(key: number, checked: boolean) {
+    setRows((r) => r.map((row) => (row.key === key ? { ...row, require_video_intro: checked } : row)));
+  }
 
   return (
     <div className="field">
@@ -92,6 +97,19 @@ export function VacancyRepeater({ initial }: { initial?: VacancyInitial[] }) {
               <label style={{ fontSize: 12 }}>Experience / qualifications / benefits</label>
               <textarea name="vac_details" style={{ minHeight: 60 }} defaultValue={row.details ?? undefined} />
             </div>
+            <div className="checkbox-row" style={{ marginTop: 10, marginBottom: 0 }}>
+              <input
+                id={`vac_require_video_checkbox_${row.key}`}
+                type="checkbox"
+                checked={row.require_video_intro ?? false}
+                onChange={(e) => toggleRequireVideo(row.key, e.target.checked)}
+              />
+              <label htmlFor={`vac_require_video_checkbox_${row.key}`} style={{ fontSize: 12.5 }}>
+                Require a short 1-2 minute video introduction for this position (recommended for
+                senior roles)
+              </label>
+            </div>
+            <input type="hidden" name="vac_require_video" value={row.require_video_intro ? "true" : "false"} />
           </div>
         ))}
       </div>

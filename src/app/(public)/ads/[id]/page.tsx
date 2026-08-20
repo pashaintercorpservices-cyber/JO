@@ -32,7 +32,7 @@ export default async function AdDetailPage({ params }: PageProps<"/ads/[id]">) {
     country: v.country,
     city: v.city,
     salary_range: v.salary_range,
-    requireVideoIntro: ad.require_video_intro,
+    requireVideoIntro: v.require_video_intro,
   }));
 
   return (

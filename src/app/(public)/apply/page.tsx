@@ -6,7 +6,7 @@ export default async function ApplyPage() {
   const supabase = await createClient();
   const { data: vacancies } = await supabase
     .from("job_vacancies")
-    .select("id, title, country, city, salary_range, job_ads!inner(status, require_video_intro)")
+    .select("id, title, country, city, salary_range, require_video_intro, job_ads!inner(status)")
     .eq("job_ads.status", "live")
     .order("created_at", { ascending: false });
 
@@ -31,10 +31,7 @@ export default async function ApplyPage() {
                 country: v.country,
                 city: v.city,
                 salary_range: v.salary_range,
-                requireVideoIntro: Boolean(
-                  (v as unknown as { job_ads?: { require_video_intro?: boolean } }).job_ads
-                    ?.require_video_intro
-                ),
+                requireVideoIntro: Boolean(v.require_video_intro),
               }))}
               prefill={
                 user
