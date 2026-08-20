@@ -77,6 +77,9 @@ export function ResumeUploadField({
       {status === "uploading" && <span className="hint">Uploading…</span>}
       {status === "error" && <span className="hint">Upload failed — please choose the file again.</span>}
       {fileName && status === "idle" && <span className="hint">Attached: {fileName}</span>}
+      {fileName?.toLowerCase().endsWith(".doc") && status === "idle" && (
+        <span className="hint">Note: old .doc files can't be auto-scored against the job — a PDF or .docx works best.</span>
+      )}
       <input type="hidden" name="resume_path" value={resumePath} />
     </div>
   );

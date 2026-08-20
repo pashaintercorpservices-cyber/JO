@@ -114,6 +114,10 @@ export default async function AdminApplicationsPage({
                         >
                           {app.match_score}%
                         </span>
+                      ) : app.resume_url?.toLowerCase().endsWith(".doc") ? (
+                        <span title="Old .doc format can't be scored -- ask the candidate for a PDF or .docx resume">
+                          N/A
+                        </span>
                       ) : (
                         "—"
                       )}
