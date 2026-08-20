@@ -35,7 +35,7 @@ export function ApplyForm({
   const [resumeReady, setResumeReady] = useState(false);
   const [resumeFile, setResumeFile] = useState<ResumePreview | null>(null);
   const [step, setStep] = useState<1 | 2>(1);
-  const formRef = useRef<HTMLFormElement>(null);
+  const step1Ref = useRef<HTMLDivElement>(null);
 
   if (state.success) {
     return (
@@ -46,18 +46,26 @@ export function ApplyForm({
   }
 
   function handleContinue() {
-    if (!formRef.current) return;
-    // Step 2 fields are display:none right now, so this only validates step 1's
-    // required fields (hidden fields are excluded from constraint validation).
-    if (!formRef.current.reportValidity()) return;
-    setStep(2);
+    if (!step1Ref.current) return;
+    // Validate only step 1's own fields. form.reportValidity() would also try to
+    // validate step 2's required fields (suitability_answer, resume_confirmed) --
+    // browsers can't focus those while their container is display:none and throw
+    // "not focusable" instead of reporting, which silently breaks Continue.
+    const fields = step1Ref.current.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+      "[required]"
+    );
+    let allValid = true;
+    fields.forEach((field) => {
+      if (!field.reportValidity()) allValid = false;
+    });
+    if (allValid) setStep(2);
   }
 
   return (
-    <form ref={formRef} action={formAction}>
+    <form action={formAction}>
       {state.error && <div className="form-error">{state.error}</div>}
 
-      <div style={{ display: step === 1 ? "block" : "none" }}>
+      <div ref={step1Ref} style={{ display: step === 1 ? "block" : "none" }}>
         <div className="field">
           <label htmlFor="job_vacancy_id">Position you&apos;re applying for</label>
           <select

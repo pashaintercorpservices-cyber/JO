@@ -29,20 +29,20 @@ export default async function AdminAdsPage() {
         <>
           <h2 style={{ fontSize: 16, marginBottom: 12 }}>Pending approval ({pending.length})</h2>
           <div className="table-wrap" style={{ marginBottom: 28 }}>
-            <table className="data">
+            <table className="data table-flexible">
               <thead>
                 <tr>
-                  <th>Position</th>
-                  <th>Agency</th>
-                  <th>Country</th>
-                  <th>Posted</th>
-                  <th></th>
+                  <th style={{ width: "30%" }}>Position</th>
+                  <th style={{ width: "20%" }}>Agency</th>
+                  <th style={{ width: "12%" }}>Country</th>
+                  <th style={{ width: "12%" }}>Posted</th>
+                  <th style={{ width: "26%" }}></th>
                 </tr>
               </thead>
               <tbody>
                 {pending.map((ad) => (
                   <tr key={ad.id}>
-                    <td style={{ fontWeight: 700, maxWidth: 240 }}>
+                    <td style={{ fontWeight: 700 }}>
                       <Link
                         href={`/admin/ads/${ad.id}`}
                         title={ad.title}
@@ -51,12 +51,13 @@ export default async function AdminAdsPage() {
                           display: "block",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {ad.title}
                       </Link>
                     </td>
-                    <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <td style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}
                     </td>
                     <td>{ad.country}</td>
@@ -77,21 +78,21 @@ export default async function AdminAdsPage() {
         <div className="empty-state">No other ads.</div>
       ) : (
         <div className="table-wrap">
-          <table className="data">
+          <table className="data table-flexible">
             <thead>
               <tr>
-                <th>Position</th>
-                <th>Agency</th>
-                <th>Country</th>
-                <th>Status</th>
-                <th>FB/IG promo</th>
-                <th></th>
+                <th style={{ width: "24%" }}>Position</th>
+                <th style={{ width: "17%" }}>Agency</th>
+                <th style={{ width: "10%" }}>Country</th>
+                <th style={{ width: "11%" }}>Status</th>
+                <th style={{ width: "13%" }}>FB/IG promo</th>
+                <th style={{ width: "25%" }}></th>
               </tr>
             </thead>
             <tbody>
               {rest.map((ad) => (
                 <tr key={ad.id}>
-                  <td style={{ fontWeight: 700, maxWidth: 240 }}>
+                  <td style={{ fontWeight: 700 }}>
                     <Link
                       href={`/admin/ads/${ad.id}`}
                       title={ad.title}
@@ -105,7 +106,7 @@ export default async function AdminAdsPage() {
                       {ad.title}
                     </Link>
                   </td>
-                  <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <td style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {(ad as { agencies?: { agency_name?: string } }).agencies?.agency_name}
                   </td>
                   <td>{ad.country}</td>
