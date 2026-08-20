@@ -1,21 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function ResumeUploadField({ onReadyChange }: { onReadyChange: (ready: boolean) => void }) {
+export type ResumePreview = {
+  name: string;
+  size: number;
+  type: string;
+  previewUrl: string;
+};
+
+export function ResumeUploadField({
+  onReadyChange,
+  onFileSelected,
+}: {
+  onReadyChange: (ready: boolean) => void;
+  onFileSelected: (preview: ResumePreview | null) => void;
+}) {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [resumePath, setResumePath] = useState("");
   const [fileName, setFileName] = useState("");
+  const previewUrlRef = useRef<string>("");
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+
     const file = e.target.files?.[0];
     if (!file) {
       setResumePath("");
       setFileName("");
+      previewUrlRef.current = "";
       onReadyChange(false);
+      onFileSelected(null);
       return;
     }
+
+    // Local object URL for the preview step -- doesn't need the upload to finish.
+    const previewUrl = URL.createObjectURL(file);
+    previewUrlRef.current = previewUrl;
+    onFileSelected({ name: file.name, size: file.size, type: file.type, previewUrl });
 
     setStatus("uploading");
     setResumePath("");

@@ -16,6 +16,8 @@ export async function submitApplicationAction(
   const phone = String(formData.get("phone") || "").trim();
   const resumePath = String(formData.get("resume_path") || "").trim();
   const consent = formData.get("consent") === "on";
+  const suitabilityAnswer = String(formData.get("suitability_answer") || "").trim();
+  const resumeConfirmed = formData.get("resume_confirmed") === "on";
 
   if (!jobVacancyId) return { error: "Select the vacancy you're applying for." };
   if (!name || !email || !phone) {
@@ -26,6 +28,12 @@ export async function submitApplicationAction(
   }
   if (!consent) {
     return { error: "Please confirm you consent to sharing your details with the advertising agency." };
+  }
+  if (!suitabilityAnswer) {
+    return { error: "Please tell us why you're suitable for this vacancy." };
+  }
+  if (!resumeConfirmed) {
+    return { error: "Please confirm you've attached the correct file/resume." };
   }
 
   const supabase = await createClient();
@@ -69,6 +77,8 @@ export async function submitApplicationAction(
     resume_url: resumePath || null,
     source: user ? "account" : "guest",
     consent: true,
+    suitability_answer: suitabilityAnswer,
+    resume_confirmed: resumeConfirmed,
   });
 
   if (error) return { error: error.message };
@@ -86,6 +96,7 @@ export async function submitApplicationAction(
     applicantPhone: phone,
     positionTitle: vacancy.title,
     resumeUrl: resumeLinkForEmail,
+    suitabilityAnswer,
   });
 
   await sendCandidateConfirmationEmail({

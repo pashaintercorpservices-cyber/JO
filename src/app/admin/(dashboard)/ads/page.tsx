@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import { STATUS_LABEL, STATUS_BADGE_CLASS, formatDate } from "@/lib/format";
 import { AdRowActions } from "./AdRowActions";
 import { PromoStatusSelect } from "@/components/admin/PromoStatusSelect";
 
 export default async function AdminAdsPage() {
   const supabase = await createClient();
+  const user = await getCurrentUser();
+  const canDelete = Boolean(user?.profile.is_super_admin);
   const { data: ads } = await supabase
     .from("job_ads")
     .select("*, agencies(agency_name)")
@@ -48,7 +51,7 @@ export default async function AdminAdsPage() {
                     <td>{ad.country}</td>
                     <td>{formatDate(ad.created_at)}</td>
                     <td>
-                      <AdRowActions jobAdId={ad.id} status={ad.status} />
+                      <AdRowActions jobAdId={ad.id} status={ad.status} canDelete={canDelete} />
                     </td>
                   </tr>
                 ))}
@@ -98,7 +101,7 @@ export default async function AdminAdsPage() {
                     )}
                   </td>
                   <td>
-                    <AdRowActions jobAdId={ad.id} status={ad.status} />
+                    <AdRowActions jobAdId={ad.id} status={ad.status} canDelete={canDelete} />
                   </td>
                 </tr>
               ))}

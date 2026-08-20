@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import { STATUS_LABEL, STATUS_BADGE_CLASS, PROMO_LABEL, formatDate, formatRupees } from "@/lib/format";
 import { AdRowActions } from "../AdRowActions";
 import { PromoStatusSelect } from "@/components/admin/PromoStatusSelect";
+import { VacancyDeleteButton } from "./VacancyDeleteButton";
 
 export default async function AdminAdDetailPage({ params }: PageProps<"/admin/ads/[id]">) {
   const { id } = await params;
   const supabase = await createClient();
+  const user = await getCurrentUser();
+  const canDelete = Boolean(user?.profile.is_super_admin);
 
   const { data: ad } = await supabase
     .from("job_ads")
@@ -95,7 +99,7 @@ export default async function AdminAdDetailPage({ params }: PageProps<"/admin/ad
 
       <div className="card" style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 16, marginBottom: 14 }}>Actions</h2>
-        <AdRowActions jobAdId={ad.id} status={ad.status} />
+        <AdRowActions jobAdId={ad.id} status={ad.status} canDelete={canDelete} />
       </div>
 
       {ad.image_url && (
@@ -130,6 +134,7 @@ export default async function AdminAdDetailPage({ params }: PageProps<"/admin/ad
                   <th>Salary</th>
                   <th>Openings</th>
                   <th>Details</th>
+                  {canDelete && <th></th>}
                 </tr>
               </thead>
               <tbody>
@@ -143,6 +148,11 @@ export default async function AdminAdDetailPage({ params }: PageProps<"/admin/ad
                     <td>{v.salary_range || "—"}</td>
                     <td>{v.vacancies ?? "—"}</td>
                     <td style={{ whiteSpace: "pre-wrap", maxWidth: 320 }}>{v.details || "—"}</td>
+                    {canDelete && (
+                      <td>
+                        <VacancyDeleteButton vacancyId={v.id} title={v.title} />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

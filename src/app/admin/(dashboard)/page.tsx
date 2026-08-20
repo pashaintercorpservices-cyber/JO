@@ -1,9 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import { formatDate } from "@/lib/format";
 import { AgencyVerifyToggle } from "./AgencyRow";
+import { AgencyDeleteButton } from "./AgencyDeleteButton";
 
 export default async function AdminAgenciesPage() {
   const supabase = await createClient();
+  const user = await getCurrentUser();
+  const canDelete = Boolean(user?.profile.is_super_admin);
   const { data: agencies } = await supabase
     .from("agencies")
     .select("*")
@@ -45,8 +49,11 @@ export default async function AdminAgenciesPage() {
                     </span>
                   </td>
                   <td>{formatDate(a.created_at)}</td>
-                  <td>
+                  <td style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <AgencyVerifyToggle agencyId={a.id} verified={a.verified} />
+                    {canDelete && (
+                      <AgencyDeleteButton profileId={a.profile_id} agencyName={a.agency_name} />
+                    )}
                   </td>
                 </tr>
               ))}

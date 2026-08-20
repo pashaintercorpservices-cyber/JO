@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/format";
 import { ResetPasswordControl } from "@/components/admin/ResetPasswordControl";
+import { UserDeleteButton } from "@/components/admin/UserDeleteButton";
 
 const ROLE_LABEL: Record<string, string> = {
   admin: "Admin",
@@ -60,6 +61,7 @@ export default async function AdminUsersPage() {
                 <th>Role</th>
                 <th>Joined</th>
                 <th>Password</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -79,6 +81,13 @@ export default async function AdminUsersPage() {
                   <td>{formatDate(u.createdAt)}</td>
                   <td>
                     <ResetPasswordControl userId={u.id} email={u.email} />
+                  </td>
+                  <td>
+                    {u.id === currentUser.id ? (
+                      <span style={{ fontSize: 12.5, color: "var(--muted)" }}>This is you</span>
+                    ) : (
+                      <UserDeleteButton userId={u.id} label={u.fullName || u.agencyName || u.email} />
+                    )}
                   </td>
                 </tr>
               ))}

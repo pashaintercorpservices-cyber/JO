@@ -1,9 +1,17 @@
 "use client";
 
 import { AdminActionButton } from "@/components/admin/AdminActionButton";
-import { setAdStatusAction, markAdPaidManuallyAction } from "@/lib/actions/admin";
+import { setAdStatusAction, markAdPaidManuallyAction, deleteJobAdAction } from "@/lib/actions/admin";
 
-export function AdRowActions({ jobAdId, status }: { jobAdId: string; status: string }) {
+export function AdRowActions({
+  jobAdId,
+  status,
+  canDelete = false,
+}: {
+  jobAdId: string;
+  status: string;
+  canDelete?: boolean;
+}) {
   return (
     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
       {status === "pending_payment" && (
@@ -49,6 +57,14 @@ export function AdRowActions({ jobAdId, status }: { jobAdId: string; status: str
           className="btn btn-danger btn-sm"
           confirmMessage="Close this ad? It will be removed from the homepage."
           onAction={() => setAdStatusAction(jobAdId, "closed")}
+        />
+      )}
+      {canDelete && (
+        <AdminActionButton
+          label="Delete"
+          className="btn btn-danger btn-sm"
+          confirmMessage="Permanently delete this ad? This also deletes its vacancies, payment records, and applications. This cannot be undone."
+          onAction={() => deleteJobAdAction(jobAdId)}
         />
       )}
     </div>

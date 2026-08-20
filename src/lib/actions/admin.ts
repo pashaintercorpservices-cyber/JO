@@ -92,3 +92,46 @@ export async function markAdPaidManuallyAction(jobAdId: string) {
   revalidatePath("/admin/ads");
   revalidatePath("/admin");
 }
+
+// Deletes below are super-admin only per the platform's own policy (not just a technical
+// RLS gate) -- they're destructive and, for job ads/agencies, cascade to everything
+// underneath (vacancies, payments, applications). Uses the admin client since some of
+// these tables don't grant DELETE to the regular admin role via RLS.
+
+export async function deleteJobVacancyAction(vacancyId: string) {
+  await requireSuperAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.from("job_vacancies").delete().eq("id", vacancyId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/ads");
+}
+
+export async function deleteJobAdAction(jobAdId: string) {
+  await requireSuperAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.from("job_ads").delete().eq("id", jobAdId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/ads");
+  revalidatePath("/admin");
+}
+
+export async function deleteApplicationAction(applicationId: string) {
+  await requireSuperAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.from("applications").delete().eq("id", applicationId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/applications");
+  revalidatePath("/admin/ads");
+}
+
+// Deletes the auth.users row via the Admin API. profiles.id has an ON DELETE CASCADE
+// foreign key to auth.users, which cascades through agencies -> job_ads -> job_vacancies/
+// payments/applications, so this one call removes the whole account tree.
+export async function deleteUserAction(profileId: string) {
+  await requireSuperAdmin();
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.deleteUser(profileId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/admin/users");
+}

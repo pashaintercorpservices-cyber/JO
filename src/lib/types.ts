@@ -81,8 +81,10 @@ export type Database = {
           name: string;
           phone: string;
           position_applied: string;
+          resume_confirmed: boolean;
           resume_url: string | null;
           source: "guest" | "account";
+          suitability_answer: string | null;
         };
         Insert: {
           applicant_profile_id?: string | null;
@@ -95,8 +97,10 @@ export type Database = {
           name: string;
           phone: string;
           position_applied: string;
+          resume_confirmed?: boolean;
           resume_url?: string | null;
           source?: "guest" | "account";
+          suitability_answer?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["applications"]["Insert"]>;
         Relationships: [];

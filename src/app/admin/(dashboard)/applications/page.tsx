@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/auth";
 import { getResumeSignedUrl } from "@/lib/resume";
 import { formatDate } from "@/lib/format";
+import { ApplicationDeleteButton } from "./ApplicationDeleteButton";
 
 export default async function AdminApplicationsPage({
   searchParams,
@@ -9,6 +11,8 @@ export default async function AdminApplicationsPage({
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
 
   const supabase = await createClient();
+  const user = await getCurrentUser();
+  const canDelete = Boolean(user?.profile.is_super_admin);
   let query = supabase
     .from("applications")
     .select("*, job_ads(title, country, agencies(agency_name))")
@@ -72,6 +76,7 @@ export default async function AdminApplicationsPage({
                 <th>Resume</th>
                 <th>Source</th>
                 <th>Received</th>
+                {canDelete && <th></th>}
               </tr>
             </thead>
             <tbody>
@@ -102,6 +107,11 @@ export default async function AdminApplicationsPage({
                     </td>
                     <td>{app.source === "account" ? "Registered" : "Guest"}</td>
                     <td>{formatDate(app.created_at)}</td>
+                    {canDelete && (
+                      <td>
+                        <ApplicationDeleteButton applicationId={app.id} name={app.name} />
+                      </td>
+                    )}
                   </tr>
                 );
               })}

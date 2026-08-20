@@ -71,6 +71,7 @@ export async function sendApplicationEmail(params: {
   applicantPhone: string;
   positionTitle: string;
   resumeUrl?: string;
+  suitabilityAnswer?: string;
 }) {
   const subject = `Application: ${params.applicantName} - ${params.positionTitle} | JobsOverseas.in`;
   const text = [
@@ -87,6 +88,9 @@ export async function sendApplicationEmail(params: {
     params.resumeUrl
       ? `Resume: Please access the candidate's CV through the link below.\n${params.resumeUrl}`
       : "Resume: not attached",
+    ...(params.suitabilityAnswer
+      ? ["", `Why the candidate feels suitable: ${params.suitabilityAnswer}`]
+      : []),
     "",
     "Should you wish to proceed with the candidate, please feel free to communicate with the candidate directly.",
     "",
@@ -107,6 +111,11 @@ export async function sendApplicationEmail(params: {
         ? `<a href="${escapeHtml(params.resumeUrl)}" style="display:inline-block; background:#f2861b; color:#241000; font-weight:bold; text-decoration:none; padding:10px 18px; border-radius:6px;">View Candidate Resume</a>`
         : "Resume: not attached"
     }</p>
+    ${
+      params.suitabilityAnswer
+        ? `<p style="margin:0 0 16px; padding:14px 16px; background:#eef2f9; border-radius:8px;"><strong>Why the candidate feels suitable:</strong><br>${escapeHtml(params.suitabilityAnswer)}</p>`
+        : ""
+    }
     <p style="margin:0 0 16px;">Should you wish to proceed with the candidate, please feel free to communicate with the candidate directly.</p>
     <p style="margin:0;">Best regards,<br>Team - JobsOverseas.in</p>
   `);
