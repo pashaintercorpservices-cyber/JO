@@ -328,6 +328,8 @@ nav.primary a:hover, nav.primary a.active { color: var(--ink); }
 .dash-nav a.active { background: var(--navy-900); color: #fff; }
 .dash-main { padding: 32px; flex: 1; min-width: 0; }
 .dash-main .wrap { max-width: 1040px; margin: 0; padding: 0; }
+/* Pages with a data table (many columns) benefit from the full width; forms don't. */
+.dash-main:has(.table-wrap) .wrap { max-width: none; }
 
 /* ============ Tables ============ */
 .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
