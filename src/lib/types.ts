@@ -330,6 +330,24 @@ export type Database = {
         Update: Partial<Database["ops"]["Tables"]["email_outreach_log"]["Insert"]>;
         Relationships: [];
       };
+      outreach_agencies: {
+        Row: {
+          source_row: number;
+          agency_name: string;
+          agency_email: string;
+          location: string | null;
+          sent: boolean;
+        };
+        Insert: {
+          source_row: number;
+          agency_name: string;
+          agency_email: string;
+          location?: string | null;
+          sent?: boolean;
+        };
+        Update: Partial<Database["ops"]["Tables"]["outreach_agencies"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
