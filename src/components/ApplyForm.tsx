@@ -57,8 +57,9 @@ export function ApplyForm({
   function handleContinue() {
     if (!step1Ref.current) return;
     // Validate only step 1's own fields. form.reportValidity() would also try to
-    // validate step 2's required fields (suitability_answer, resume_confirmed) --
-    // browsers can't focus those while their container is display:none and throw
+    // validate step 2's required fields (suitability_answer, resume_confirmed,
+    // availability_confirmed) -- browsers can't focus those while their container
+    // is display:none and throw
     // "not focusable" instead of reporting, which silently breaks Continue.
     const fields = step1Ref.current.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
       "[required]"
@@ -165,6 +166,15 @@ export function ApplyForm({
           <input id="resume_confirmed" name="resume_confirmed" type="checkbox" required />
           <label htmlFor="resume_confirmed">
             I&apos;ve checked the preview above and confirm this is the correct file / resume.
+          </label>
+        </div>
+
+        <div className="checkbox-row">
+          <input id="availability_confirmed" name="availability_confirmed" type="checkbox" required />
+          <label htmlFor="availability_confirmed">
+            I confirm I am genuinely interested in and available to work in
+            {selectedVacancy ? ` ${selectedVacancy.city ? `${selectedVacancy.city}, ` : ""}${selectedVacancy.country}` : " the job location"}
+            {" "}if selected.
           </label>
         </div>
 

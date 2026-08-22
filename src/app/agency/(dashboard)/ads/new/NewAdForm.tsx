@@ -8,7 +8,15 @@ import { createJobAdAction, type AdFormState } from "@/lib/actions/jobAds";
 import { COUNTRIES } from "@/lib/format";
 import { formatRupees } from "@/lib/format";
 
-export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: number }) {
+export function NewAdForm({
+  userId,
+  feePaise,
+  discountedFeePaise,
+}: {
+  userId: string;
+  feePaise: number;
+  discountedFeePaise?: number | null;
+}) {
   const [state, formAction] = useActionState<AdFormState, FormData>(createJobAdAction, {});
   const [imageUrl, setImageUrl] = useState("");
 
@@ -124,7 +132,18 @@ export function NewAdForm({ userId, feePaise }: { userId: string; feePaise: numb
       </div>
 
       <div className="card" style={{ background: "var(--surface-2)", marginBottom: 16 }}>
-        <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>
+        {discountedFeePaise != null ? (
+          <p style={{ fontWeight: 700, marginBottom: 6 }}>
+            Posting fee —{" "}
+            <span style={{ textDecoration: "line-through", opacity: 0.6, fontWeight: 400 }}>
+              {formatRupees(feePaise)}
+            </span>{" "}
+            {formatRupees(discountedFeePaise)}{" "}
+            <span style={{ fontWeight: 400, fontSize: 13 }}>(first-post discount applied)</span>
+          </p>
+        ) : (
+          <p style={{ fontWeight: 700, marginBottom: 6 }}>Posting fee — {formatRupees(feePaise)}</p>
+        )}
         <p style={{ fontSize: 13.5, color: "var(--muted)" }}>
           Includes a Facebook &amp; Instagram promotion of your ad (₹1,500 budget, run over 2 days
           by the JobsOverseas team). Payment is collected on the next step via Razorpay.

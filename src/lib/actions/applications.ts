@@ -21,6 +21,7 @@ export async function submitApplicationAction(
   const consent = formData.get("consent") === "on";
   const suitabilityAnswer = String(formData.get("suitability_answer") || "").trim();
   const resumeConfirmed = formData.get("resume_confirmed") === "on";
+  const availabilityConfirmed = formData.get("availability_confirmed") === "on";
   const videoIntroPath = String(formData.get("video_intro_path") || "").trim();
   const videoIntroSecondsRaw = String(formData.get("video_intro_seconds") || "").trim();
 
@@ -39,6 +40,9 @@ export async function submitApplicationAction(
   }
   if (!resumeConfirmed) {
     return { error: "Please confirm you've attached the correct file/resume." };
+  }
+  if (!availabilityConfirmed) {
+    return { error: "Please confirm your interest and availability for the job location." };
   }
 
   const supabase = await createClient();
@@ -116,6 +120,7 @@ export async function submitApplicationAction(
     consent: true,
     suitability_answer: suitabilityAnswer,
     resume_confirmed: resumeConfirmed,
+    availability_confirmed: availabilityConfirmed,
     match_score: matchScore,
     match_summary: matchSummary,
     video_intro_url: videoIntroPath || null,

@@ -30,7 +30,18 @@ export default async function PayForAdPage({
       <div className="section-head">
         <p className="eyebrow">Payment</p>
         <h1>Pay to publish “{ad.title}”</h1>
-        <p>{formatRupees(payment.amount_paise)} inclusive of taxes — includes FB &amp; Instagram promotion.</p>
+        {payment.discount_percent ? (
+          <p>
+            <span style={{ textDecoration: "line-through", opacity: 0.6 }}>
+              {formatRupees(payment.base_amount_paise ?? payment.amount_paise)}
+            </span>{" "}
+            <strong>{formatRupees(payment.amount_paise)}</strong> inclusive of taxes — first-post
+            discount applied ({payment.discount_percent}% off). Includes FB &amp; Instagram
+            promotion.
+          </p>
+        ) : (
+          <p>{formatRupees(payment.amount_paise)} inclusive of taxes — includes FB &amp; Instagram promotion.</p>
+        )}
       </div>
       <div className="card" style={{ maxWidth: 460 }}>
         <PaymentPanel

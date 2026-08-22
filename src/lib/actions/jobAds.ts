@@ -3,6 +3,12 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getRazorpay, AD_POST_FEE_PAISE } from "@/lib/razorpay";
+import {
+  isEligibleForFirstPostDiscount,
+  applyFirstPostDiscount,
+  FIRST_POST_DISCOUNT_PERCENT,
+  FIRST_POST_DISCOUNT_CODE,
+} from "@/lib/discount";
 
 export type AdFormState = { error?: string };
 
@@ -134,11 +140,19 @@ export async function createJobAdAction(
     redirect(`/agency/ads/${ad.id}?paid=1`);
   }
 
+  // First-post discount: 25% off, only for an agency with zero prior *paid* posts.
+  // Checked here (server-side, at charge time) regardless of what the form page
+  // displayed -- the display is a convenience, this check is the actual gate.
+  const eligibleForDiscount = await isEligibleForFirstPostDiscount(supabase, agency.id);
+  const chargeAmountPaise = eligibleForDiscount
+    ? applyFirstPostDiscount(AD_POST_FEE_PAISE)
+    : AD_POST_FEE_PAISE;
+
   let orderId = `mock_${ad.id}`;
   const rzp = getRazorpay();
   if (rzp) {
     const order = await rzp.orders.create({
-      amount: AD_POST_FEE_PAISE,
+      amount: chargeAmountPaise,
       currency: "INR",
       receipt: ad.id,
     });
@@ -150,7 +164,10 @@ export async function createJobAdAction(
     .insert({
       job_ad_id: ad.id,
       agency_id: agency.id,
-      amount_paise: AD_POST_FEE_PAISE,
+      amount_paise: chargeAmountPaise,
+      base_amount_paise: eligibleForDiscount ? AD_POST_FEE_PAISE : null,
+      discount_code: eligibleForDiscount ? FIRST_POST_DISCOUNT_CODE : null,
+      discount_percent: eligibleForDiscount ? FIRST_POST_DISCOUNT_PERCENT : null,
       razorpay_order_id: orderId,
     })
     .select("id")

@@ -72,6 +72,7 @@ export type Database = {
       applications: {
         Row: {
           applicant_profile_id: string | null;
+          availability_confirmed: boolean;
           consent: boolean;
           created_at: string;
           email: string;
@@ -92,6 +93,7 @@ export type Database = {
         };
         Insert: {
           applicant_profile_id?: string | null;
+          availability_confirmed?: boolean;
           consent?: boolean;
           created_at?: string;
           email: string;
@@ -199,7 +201,10 @@ export type Database = {
         Row: {
           agency_id: string;
           amount_paise: number;
+          base_amount_paise: number | null;
           created_at: string;
+          discount_code: string | null;
+          discount_percent: number | null;
           id: string;
           job_ad_id: string;
           razorpay_order_id: string | null;
@@ -209,7 +214,10 @@ export type Database = {
         Insert: {
           agency_id: string;
           amount_paise?: number;
+          base_amount_paise?: number | null;
           created_at?: string;
+          discount_code?: string | null;
+          discount_percent?: number | null;
           id?: string;
           job_ad_id: string;
           razorpay_order_id?: string | null;
@@ -274,6 +282,58 @@ export type Database = {
       promo_status: "not_started" | "scheduled" | "running" | "completed";
       user_role: "agency" | "candidate" | "admin";
     };
+    CompositeTypes: { [_ in never]: never };
+  };
+  ops: {
+    Tables: {
+      admin_api_tokens: {
+        Row: {
+          token: string;
+          purpose: string;
+          created_at: string;
+          last_used_at: string | null;
+        };
+        Insert: {
+          token: string;
+          purpose: string;
+          created_at?: string;
+          last_used_at?: string | null;
+        };
+        Update: Partial<Database["ops"]["Tables"]["admin_api_tokens"]["Insert"]>;
+        Relationships: [];
+      };
+      email_outreach_log: {
+        Row: {
+          id: string;
+          role_id: string;
+          campaign: string;
+          source_row: number;
+          agency_name: string;
+          agency_email: string;
+          location: string | null;
+          status: "sent" | "failed";
+          error_message: string | null;
+          sent_at: string;
+        };
+        Insert: {
+          id?: string;
+          role_id: string;
+          campaign?: string;
+          source_row: number;
+          agency_name: string;
+          agency_email: string;
+          location?: string | null;
+          status: "sent" | "failed";
+          error_message?: string | null;
+          sent_at?: string;
+        };
+        Update: Partial<Database["ops"]["Tables"]["email_outreach_log"]["Insert"]>;
+        Relationships: [];
+      };
+    };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };
 };

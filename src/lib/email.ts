@@ -64,6 +64,41 @@ async function sendEmail(params: { to: string; subject: string; text: string; ht
   }
 }
 
+/**
+ * Marketing/outreach send (as opposed to the transactional emails above) --
+ * full HTML supplied by the caller, from the verified jobsoverseas.in sender,
+ * with a separate Reply-To so replies land in the requested inbox regardless
+ * of which address the recipient sees as the sender.
+ */
+export async function sendOutreachEmail(params: {
+  to: string;
+  subject: string;
+  html: string;
+  replyTo: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM || "JobsOverseas <noreply@jobsoverseas.example>";
+
+  if (!apiKey) {
+    console.log("[email:mock:outreach]", { to: params.to, subject: params.subject });
+    return { ok: false, error: "RESEND_API_KEY not configured" };
+  }
+
+  const resend = new Resend(apiKey);
+  const { error: sendError } = await resend.emails.send({
+    from,
+    to: params.to,
+    replyTo: params.replyTo,
+    subject: params.subject,
+    html: params.html,
+  });
+  if (sendError) {
+    console.error("[email:outreach:failed]", { to: params.to, subject: params.subject, error: sendError });
+    return { ok: false, error: sendError.message || String(sendError) };
+  }
+  return { ok: true };
+}
+
 export async function sendApplicationEmail(params: {
   to: string;
   applicantName: string;
