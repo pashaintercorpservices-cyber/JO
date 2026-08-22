@@ -34,7 +34,7 @@ function buildSubject(agency: string): string {
  */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const { token, limit } = body as { token?: string; limit?: number };
+  const { token, limit, dryRun } = body as { token?: string; limit?: number; dryRun?: boolean };
 
   if (!token) {
     return NextResponse.json({ error: "Missing token." }, { status: 400 });
@@ -74,6 +74,17 @@ export async function POST(request: Request) {
   }
   if (!batch || batch.length === 0) {
     return NextResponse.json({ ok: true, sent: 0, failed: 0, message: "No unsent rows remaining." });
+  }
+
+  if (dryRun) {
+    // Verifies auth, the query, and template rendering without sending anything
+    // or touching sent/log state -- for confirming wiring before a real fire.
+    return NextResponse.json({
+      ok: true,
+      dryRun: true,
+      wouldSend: batch.length,
+      rows: batch.map((r) => ({ row: r.source_row, agency: r.agency_name, email: r.agency_email })),
+    });
   }
 
   let sentCount = 0;
