@@ -2,6 +2,13 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 
 export type MatchResult = { score: number; summary: string };
+export type ProviderOutcome = { result: MatchResult | null; error: string | null };
+export type ScoringResult = {
+  score: number | null;
+  summary: string | null;
+  provider: "gemini" | "claude" | null;
+  error: string | null;
+};
 
 /** Best-effort text extraction from a resume file. Returns "" (not an error) for
  * formats we can't parse (legacy .doc) or on any extraction failure -- scoring is a
@@ -55,77 +62,140 @@ function parseResult(text: string): MatchResult | null {
   return { score, summary: String(parsed.summary || "").slice(0, 300) };
 }
 
-// Free tier -- tried first so scoring works without any billing setup.
-async function scoreWithGemini(prompt: string): Promise<MatchResult | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        // maxOutputTokens must cover thinking tokens too, not just the JSON reply, or the
-        // response gets cut off mid-JSON. thinkingLevel "low" keeps thinking (and latency) down.
-        generationConfig: { maxOutputTokens: 800, thinkingConfig: { thinkingLevel: "low" } },
-      }),
+/** Runs `attempt` up to twice -- most scoring failures are transient (rate limit, cold
+ * network blip, an occasional malformed-JSON response), and a single retry clears the
+ * large majority of them without meaningfully slowing down the submission path. */
+async function withRetry<T>(attempt: () => Promise<T>): Promise<T> {
+  try {
+    return await attempt();
+  } catch (err) {
+    await new Promise((r) => setTimeout(r, 400));
+    try {
+      return await attempt();
+    } catch {
+      throw err; // surface the first error -- more representative than a second identical failure
     }
-  );
-
-  if (!res.ok) {
-    console.error("[matching:gemini-failed]", res.status, await res.text());
-    return null;
   }
-
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) return null;
-  return parseResult(text);
 }
 
-// Paid -- used only if Gemini isn't configured (or fails) and an Anthropic key exists.
-async function scoreWithClaude(prompt: string): Promise<MatchResult | null> {
+async function scoreWithGemini(prompt: string): Promise<ProviderOutcome> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return { result: null, error: "gemini:no_key" };
+
+  try {
+    return await withRetry(async () => {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent`,
+        {
+          method: "POST",
+          // Header-based auth rather than a `?key=` query param -- keeps the key out of
+          // request URLs that might otherwise land in intermediary/proxy access logs.
+          headers: { "content-type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            // maxOutputTokens must cover thinking tokens too, not just the JSON reply, or the
+            // response gets cut off mid-JSON. thinkingLevel "low" keeps thinking (and latency) down.
+            generationConfig: { maxOutputTokens: 800, thinkingConfig: { thinkingLevel: "low" } },
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const body = await res.text();
+        console.error("[matching:gemini-failed]", res.status, body);
+        throw new Error(`gemini:http_${res.status}`);
+      }
+
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("gemini:empty_response");
+
+      const parsed = parseResult(text);
+      if (!parsed) throw new Error("gemini:unparseable_response");
+      return { result: parsed, error: null };
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "gemini:unknown_error";
+    console.error("[matching:gemini-error]", message);
+    return { result: null, error: message };
+  }
+}
+
+async function scoreWithClaude(prompt: string): Promise<ProviderOutcome> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) return { result: null, error: "claude:no_key" };
 
-  const anthropic = new Anthropic({ apiKey });
-  const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 200,
-    messages: [{ role: "user", content: prompt }],
-  });
+  try {
+    return await withRetry(async () => {
+      const anthropic = new Anthropic({ apiKey });
+      const message = await anthropic.messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 200,
+        messages: [{ role: "user", content: prompt }],
+      });
 
-  const textBlock = message.content.find((b) => b.type === "text");
-  if (!textBlock || textBlock.type !== "text") return null;
-  return parseResult(textBlock.text);
+      const textBlock = message.content.find((b) => b.type === "text");
+      if (!textBlock || textBlock.type !== "text") throw new Error("claude:empty_response");
+
+      const parsed = parseResult(textBlock.text);
+      if (!parsed) throw new Error("claude:unparseable_response");
+      return { result: parsed, error: null };
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "claude:unknown_error";
+    console.error("[matching:claude-error]", message);
+    return { result: null, error: `claude:${message}` };
+  }
 }
 
+/** Scores a resume against a job description, trying Gemini first (free tier -- works
+ * without any billing setup) then falling back to Claude. Never throws -- every failure
+ * mode is reported back in `.error` instead, so callers can persist *why* scoring didn't
+ * happen rather than just recording a silent null. */
 export async function scoreResumeMatch(params: {
   resumeText: string;
   positionTitle: string;
   jobDetails: string;
-}): Promise<MatchResult | null> {
-  if (!params.resumeText.trim()) return null;
+}): Promise<ScoringResult> {
+  if (!params.resumeText.trim()) {
+    return { score: null, summary: null, provider: null, error: "extraction:empty_text" };
+  }
   if (!process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
     console.log("[matching:skip] No GEMINI_API_KEY or ANTHROPIC_API_KEY set -- skipping match scoring");
-    return null;
+    return { score: null, summary: null, provider: null, error: "config:no_provider_key" };
   }
 
   const prompt = buildPrompt(params);
 
-  try {
-    const geminiResult = await scoreWithGemini(prompt);
-    if (geminiResult) return geminiResult;
-  } catch (err) {
-    console.error("[matching:gemini-error]", err);
+  const gemini = await scoreWithGemini(prompt);
+  if (gemini.result) {
+    return { score: gemini.result.score, summary: gemini.result.summary, provider: "gemini", error: null };
   }
 
-  try {
-    return await scoreWithClaude(prompt);
-  } catch (err) {
-    console.error("[matching:claude-error]", err);
-    return null;
+  const claude = await scoreWithClaude(prompt);
+  if (claude.result) {
+    return { score: claude.result.score, summary: claude.result.summary, provider: "claude", error: null };
   }
+
+  return {
+    score: null,
+    summary: null,
+    provider: null,
+    error: `${gemini.error ?? "gemini:unknown_error"}|${claude.error ?? "claude:unknown_error"}`,
+  };
+}
+
+/** Runs both providers independently (no early-return-on-first-success) against a fixed
+ * test case, for the admin diagnostics endpoint -- lets a config problem be confirmed in
+ * one request instead of waiting on a real application and guessing from logs. */
+export async function diagnoseScoring(): Promise<{ gemini: ProviderOutcome; claude: ProviderOutcome }> {
+  const prompt = buildPrompt({
+    resumeText:
+      "Rajesh Kumar. 6 years experience as a MIG/TIG welder in structural steel fabrication, UAE and Saudi Arabia. ITI certified, safety training current.",
+    positionTitle: "MIG Welder",
+    jobDetails: "Structural steel fabrication, Jebel Ali. Minimum 3 years MIG welding experience required.",
+  });
+
+  const [gemini, claude] = await Promise.all([scoreWithGemini(prompt), scoreWithClaude(prompt)]);
+  return { gemini, claude };
 }

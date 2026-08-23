@@ -81,6 +81,7 @@ export type Database = {
           job_vacancy_id: string | null;
           match_score: number | null;
           match_summary: string | null;
+          match_score_error: string | null;
           name: string;
           phone: string;
           position_applied: string;
@@ -102,6 +103,7 @@ export type Database = {
           job_vacancy_id?: string | null;
           match_score?: number | null;
           match_summary?: string | null;
+          match_score_error?: string | null;
           name: string;
           phone: string;
           position_applied: string;

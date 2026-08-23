@@ -82,11 +82,12 @@ export async function submitApplicationAction(
     return { error: "This vacancy requires a short video introduction — please record one before submitting." };
   }
 
-  // Best-effort JD match scoring. Never blocks submission -- if the resume can't be
-  // read, or ANTHROPIC_API_KEY isn't configured, the application still goes through
-  // with match_score left null.
+  // Best-effort JD match scoring. Never blocks submission -- on any failure the
+  // application still goes through, with match_score_error recording *why* scoring
+  // didn't happen so it's queryable later instead of a silent, unexplained null.
   let matchScore: number | null = null;
   let matchSummary: string | null = null;
+  let matchScoreError: string | null = null;
   try {
     const admin = createAdminClient();
     const { data: resumeBlob } = await admin.storage.from("resumes").download(resumePath);
@@ -98,12 +99,14 @@ export async function submitApplicationAction(
         positionTitle: vacancy.title,
         jobDetails: vacancy.details || "",
       });
-      if (result) {
-        matchScore = result.score;
-        matchSummary = result.summary;
-      }
+      matchScore = result.score;
+      matchSummary = result.summary;
+      matchScoreError = result.error;
+    } else {
+      matchScoreError = "storage:download_failed";
     }
   } catch (err) {
+    matchScoreError = `unexpected:${err instanceof Error ? err.message : "unknown"}`;
     console.error("[applications:match-scoring-failed]", err);
   }
 
@@ -123,6 +126,7 @@ export async function submitApplicationAction(
     availability_confirmed: availabilityConfirmed,
     match_score: matchScore,
     match_summary: matchSummary,
+    match_score_error: matchScoreError,
     video_intro_url: videoIntroPath || null,
     video_intro_seconds: videoIntroSecondsRaw ? Number(videoIntroSecondsRaw) : null,
   });
