@@ -97,6 +97,8 @@ export async function POST(request: Request) {
     resumeText,
     positionTitle: vacancy.title,
     jobDetails: vacancy.details || "",
+    resumeBytes: bytes,
+    resumeFileName,
   });
 
   const { data: inserted, error: insertError } = await admin

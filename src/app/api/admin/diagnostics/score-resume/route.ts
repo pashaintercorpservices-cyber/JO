@@ -43,7 +43,13 @@ export async function POST(request: Request) {
 
   const bytes = Buffer.from(resumeBase64, "base64");
   const resumeText = await extractResumeText(bytes, resumeFileName);
-  const result = await scoreResumeMatch({ resumeText, positionTitle, jobDetails: jobDetails || "" });
+  const result = await scoreResumeMatch({
+    resumeText,
+    positionTitle,
+    jobDetails: jobDetails || "",
+    resumeBytes: bytes,
+    resumeFileName,
+  });
 
   return NextResponse.json({
     ok: true,

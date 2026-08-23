@@ -46,6 +46,7 @@ export async function submitApplicationAction(
   }
 
   const supabase = await createClient();
+  const admin = createAdminClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -77,9 +78,27 @@ export async function submitApplicationAction(
   }
 
   // Server-side enforcement -- the client hides/shows the recorder based on this same
-  // flag, but that's a UI convenience only, not the actual gate.
-  if (vacancy.require_video_intro && !videoIntroPath) {
-    return { error: "This vacancy requires a short video introduction — please record one before submitting." };
+  // flag, but a non-empty string in a hidden form field proves nothing by itself
+  // (trivially set via devtools without ever recording anything), so a required
+  // video must be confirmed to actually exist in storage, not just claimed.
+  if (vacancy.require_video_intro) {
+    if (!videoIntroPath) {
+      return { error: "This vacancy requires a short video introduction — please record one before submitting." };
+    }
+    const videoFolder = videoIntroPath.split("/")[0];
+    const { data: videoFiles } = await admin.storage.from("video-intros").list(videoFolder);
+    const videoExists = (videoFiles || []).some((f) => `${videoFolder}/${f.name}` === videoIntroPath);
+    if (!videoExists) {
+      return { error: "We couldn't find your recorded video — please record it again before submitting." };
+    }
+    // Recorder caps recordings at 60 or 120 seconds; the reported duration is still
+    // client-supplied, so this is a sanity bound (catches obviously-tampered values)
+    // rather than a cryptographic guarantee -- paired with the existence check above,
+    // both a real file and a plausible duration are now required, not just a string.
+    const seconds = videoIntroSecondsRaw ? Number(videoIntroSecondsRaw) : 0;
+    if (!seconds || seconds < 5 || seconds > 130) {
+      return { error: "Video introduction must be a genuine 1–2 minute recording — please re-record." };
+    }
   }
 
   // Best-effort JD match scoring. Never blocks submission -- on any failure the
@@ -89,7 +108,6 @@ export async function submitApplicationAction(
   let matchSummary: string | null = null;
   let matchScoreError: string | null = null;
   try {
-    const admin = createAdminClient();
     const { data: resumeBlob } = await admin.storage.from("resumes").download(resumePath);
     if (resumeBlob) {
       const bytes = Buffer.from(await resumeBlob.arrayBuffer());
@@ -98,6 +116,8 @@ export async function submitApplicationAction(
         resumeText,
         positionTitle: vacancy.title,
         jobDetails: vacancy.details || "",
+        resumeBytes: bytes,
+        resumeFileName: resumePath,
       });
       matchScore = result.score;
       matchSummary = result.summary;
