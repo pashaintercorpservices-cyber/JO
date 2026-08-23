@@ -104,6 +104,7 @@ export async function chatWithGemini(
       role: turn.role === "user" ? "user" : "model",
       parts: [{ text: turn.content }],
     })),
+    { role: "user", parts: [{ text: latestMessage }] },
   ];
 
   try {
