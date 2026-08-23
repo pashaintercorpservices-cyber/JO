@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/types";
 import { AdTile } from "@/components/AdTile";
@@ -7,6 +8,10 @@ import { COUNTRIES, COUNTRY_FLAGS } from "@/lib/format";
 
 const POPULAR_SEARCHES = ["Welder", "Electrician", "Driver", "HVAC Technician", "Nurse", "Site Supervisor"];
 const ADS_PER_PAGE = 16;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;

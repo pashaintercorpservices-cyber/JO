@@ -10,9 +10,13 @@ const brandFont = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "JobsOverseas — Advertise the job. Track the hire.",
+  metadataBase: new URL("https://jobsoverseas.in"),
+  title: {
+    default: "JobsOverseas: Overseas Jobs & Gulf Jobs Abroad",
+    template: "%s | JobsOverseas",
+  },
   description:
-    "JobsOverseas is where licensed overseas recruitment agencies post vacancies and candidates apply, directly.",
+    "Find verified overseas jobs and Gulf jobs abroad — live openings in UAE, Saudi Arabia, Qatar, Oman, Kuwait & Bahrain. Browse assignments abroad on JobsOverseas.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

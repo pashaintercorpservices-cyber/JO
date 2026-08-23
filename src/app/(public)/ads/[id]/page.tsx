@@ -1,8 +1,36 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { ApplyForm } from "@/components/ApplyForm";
 import { formatDate } from "@/lib/format";
+
+export async function generateMetadata({ params }: PageProps<"/ads/[id]">): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: ad } = await supabase
+    .from("job_ads")
+    .select("title, city, country, employer_name, description, status")
+    .eq("id", id)
+    .single();
+
+  if (!ad || ad.status !== "live") {
+    return { title: "Vacancy" };
+  }
+
+  const location = ad.city ? `${ad.city}, ${ad.country}` : ad.country;
+  const recruiter = ad.employer_name ? ` — ${ad.employer_name}` : "";
+  const title = `${ad.title} in ${location}${recruiter}`;
+  const description = ad.description
+    ? ad.description.slice(0, 155)
+    : `${ad.title} vacancy in ${location}. Apply directly on JobsOverseas.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/ads/${id}` },
+  };
+}
 
 export default async function AdDetailPage({ params }: PageProps<"/ads/[id]">) {
   const { id } = await params;
