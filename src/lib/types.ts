@@ -249,6 +249,94 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
       };
+      chat_sessions: {
+        Row: {
+          id: string;
+          visitor_type: "agency" | "jobseeker" | null;
+          name: string | null;
+          email: string | null;
+          phone: string | null;
+          created_at: string;
+          last_message_at: string;
+        };
+        Insert: {
+          id?: string;
+          visitor_type?: "agency" | "jobseeker" | null;
+          name?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          created_at?: string;
+          last_message_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["chat_sessions"]["Insert"]>;
+        Relationships: [];
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          session_id: string;
+          role: "user" | "assistant";
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          role: "user" | "assistant";
+          content: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["chat_messages"]["Insert"]>;
+        Relationships: [];
+      };
+      support_tickets: {
+        Row: {
+          id: string;
+          session_id: string | null;
+          visitor_type: "agency" | "jobseeker" | null;
+          name: string | null;
+          email: string | null;
+          phone: string | null;
+          subject: string;
+          chat_summary: string;
+          status: "open" | "escalated" | "resolved";
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          session_id?: string | null;
+          visitor_type?: "agency" | "jobseeker" | null;
+          name?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          subject: string;
+          chat_summary: string;
+          status?: "open" | "escalated" | "resolved";
+          created_at?: string;
+          resolved_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["support_tickets"]["Insert"]>;
+        Relationships: [];
+      };
+      support_ticket_replies: {
+        Row: {
+          id: string;
+          ticket_id: string;
+          sender: "ai_auto" | "support_team";
+          body: string;
+          sent_at: string;
+        };
+        Insert: {
+          id?: string;
+          ticket_id: string;
+          sender: "ai_auto" | "support_team";
+          body: string;
+          sent_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["support_ticket_replies"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: {
@@ -283,6 +371,8 @@ export type Database = {
       payment_status: "created" | "paid" | "failed";
       promo_status: "not_started" | "scheduled" | "running" | "completed";
       user_role: "agency" | "candidate" | "admin";
+      visitor_type: "agency" | "jobseeker";
+      ticket_status: "open" | "escalated" | "resolved";
     };
     CompositeTypes: { [_ in never]: never };
   };

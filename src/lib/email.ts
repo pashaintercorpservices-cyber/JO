@@ -99,6 +99,48 @@ export async function sendOutreachEmail(params: {
   return { ok: true };
 }
 
+/**
+ * Sends a support reply/solution email from support@jobsoverseas.in (EMAIL_FROM), used both
+ * for the AI chat's auto-resolved closing summary and the Customer Support Specialist's
+ * human-approved escalation replies. Every send here should also get logged to
+ * support_ticket_replies by the caller -- this function only sends, it doesn't persist.
+ */
+export async function sendSupportReplyEmail(params: {
+  to: string;
+  subject: string;
+  body: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.EMAIL_FROM || "JobsOverseas Support <support@jobsoverseas.example>";
+
+  const text = params.body;
+  const html = wrapEmailHtml(`
+    <p style="margin:0 0 16px; white-space:pre-wrap;">${escapeHtml(params.body)}</p>
+    <p style="margin:16px 0 0; font-size:12px; color:#5b6b87;">
+      Need anything else? Reply to this email or WhatsApp us at +91 88844 78676.
+    </p>
+  `);
+
+  if (!apiKey) {
+    console.log("[email:mock:support-reply]", { to: params.to, subject: params.subject });
+    return { ok: false, error: "RESEND_API_KEY not configured" };
+  }
+
+  const resend = new Resend(apiKey);
+  const { error: sendError } = await resend.emails.send({
+    from,
+    to: params.to,
+    subject: params.subject,
+    text,
+    html,
+  });
+  if (sendError) {
+    console.error("[email:support-reply:failed]", { to: params.to, subject: params.subject, error: sendError });
+    return { ok: false, error: sendError.message || String(sendError) };
+  }
+  return { ok: true };
+}
+
 export async function sendApplicationEmail(params: {
   to: string;
   applicantName: string;
