@@ -173,14 +173,20 @@ export async function summarizeChatForTicket(history: ChatTurn[]): Promise<{ sub
               ],
             },
           ],
-          generationConfig: { maxOutputTokens: 300, thinkingConfig: { thinkingLevel: "low" } },
+          generationConfig: { maxOutputTokens: 600, thinkingConfig: { thinkingLevel: "low" } },
         }),
       }
     );
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text) throw new Error("empty response");
-    const cleaned = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
+    let cleaned = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "");
+    // Model output occasionally gets truncated mid-string (finishReason MAX_TOKENS) despite
+    // the raised budget above -- salvage a usable object from a truncated tail rather than
+    // falling all the way back to the raw-transcript summary.
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (lastBrace === -1) cleaned += '"}';
+    else if (lastBrace < cleaned.length - 1) cleaned = cleaned.slice(0, lastBrace + 1);
     const parsed = JSON.parse(cleaned);
     return {
       subject: String(parsed.subject || "Support chat").slice(0, 200),
