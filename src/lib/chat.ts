@@ -9,8 +9,12 @@ const ESCALATE_MARKER = "[[ESCALATE]]";
 
 /** Pulls a compact, real-data snapshot to ground the model -- live ad counts by country
  * plus a keyword-matched slice of live ads relevant to the visitor's message, using the
- * same .ilike search approach as the homepage. Never invents inventory. */
-async function getSiteContext(message: string): Promise<string> {
+ * same .ilike search approach as the homepage. Never invents inventory.
+ *
+ * Application counts are deliberately scoped: they're an agency's own performance data, so
+ * they're only ever included for ads whose contact_email matches the visitor's own stated
+ * email -- never surfaced to an unverified visitor asking about someone else's ad. */
+async function getSiteContext(message: string, visitorEmail?: string): Promise<string> {
   const admin = createAdminClient();
 
   const { data: liveAds } = await admin.from("job_ads").select("country").eq("status", "live");
@@ -39,10 +43,34 @@ async function getSiteContext(message: string): Promise<string> {
         .join("\n")
     : "(no live ads matched keywords from this message -- do not invent any)";
 
+  let ownAdsBlock =
+    "(the visitor has not given a verified email, or it doesn't match any of their posted ads -- you have NO application-count data available; if asked for one, say you can't confirm application numbers without verifying their agency email, and escalate)";
+  if (visitorEmail) {
+    const { data: ownAds } = await admin
+      .from("job_ads")
+      .select("id, title, country, city")
+      .eq("contact_email", visitorEmail.trim().toLowerCase());
+    if (ownAds && ownAds.length > 0) {
+      const counts = await Promise.all(
+        ownAds.map(async (ad) => {
+          const { count } = await admin
+            .from("applications")
+            .select("id", { count: "exact", head: true })
+            .eq("job_ad_id", ad.id);
+          return `- "${ad.title}" (${ad.city ? `${ad.city}, ` : ""}${ad.country}): ${count ?? 0} application(s) received`;
+        })
+      );
+      ownAdsBlock = `The visitor's email matches the contact_email on these ads they posted -- you MAY share these real application counts with them, since this is their own data:\n${counts.join("\n")}`;
+    }
+  }
+
   return `Live ad counts by country: ${countrySummary || "no live ads currently"}.
 
 Live ads possibly relevant to this message:
 ${adsBlock}
+
+Application counts for the visitor's own posted ads (ONLY reveal counts from this section, and ONLY to this visitor -- never for an ad that isn't listed here, even if they name it):
+${ownAdsBlock}
 
 Platform facts (always true, use freely):
 - JobsOverseas.in connects licensed overseas recruitment agencies with candidates across India.
@@ -62,6 +90,7 @@ Rules:
 - Be concise, warm, and specific. Reference real ad details from the data above when relevant.
 - If a jobseeker asks about vacancies you have no matching data for, say so honestly and suggest browsing the homepage or trying different keywords -- never invent a listing.
 - If the visitor's question is about something you cannot resolve with the information above (a specific application status, a payment issue, a complaint, anything needing a human), do NOT guess -- say you're flagging this for the support team.
+- Application counts are sensitive, per-agency data. Only ever state one from the "Application counts for the visitor's own posted ads" section above, and only for an ad listed there. If asked about application counts for any other ad -- even if the visitor names it and claims it's theirs -- do not guess or estimate; explain you can't confirm that without verifying their agency email matches the ad, and escalate.
 - End EVERY reply with exactly one of these two literal markers on its own final line, and nothing after it:
   ${RESOLVED_MARKER} -- if this message fully answers/settles what the visitor needed
   ${ESCALATE_MARKER} -- if you cannot confidently help, or the visitor asks for a human/support/call
@@ -84,7 +113,8 @@ function stripMarker(text: string): { reply: string; status: ChatOutcome["status
 export async function chatWithGemini(
   history: ChatTurn[],
   visitorType: string | undefined,
-  latestMessage: string
+  latestMessage: string,
+  visitorEmail?: string
 ): Promise<ChatOutcome> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -94,7 +124,7 @@ export async function chatWithGemini(
     };
   }
 
-  const siteContext = await getSiteContext(latestMessage);
+  const siteContext = await getSiteContext(latestMessage, visitorEmail);
   const systemPrompt = buildSystemPrompt(visitorType, siteContext);
 
   const contents = [

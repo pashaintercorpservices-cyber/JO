@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   await admin.from("chat_sessions").update({ last_message_at: new Date().toISOString() }).eq("id", session.id);
 
   const fullHistory = [...history, { role: "user" as const, content: message }];
-  const outcome = await chatWithGemini(history, visitorType, message);
+  const outcome = await chatWithGemini(history, visitorType, message, email);
 
   await admin.from("chat_messages").insert({ session_id: session.id, role: "assistant", content: outcome.reply });
 
