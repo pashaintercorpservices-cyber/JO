@@ -440,6 +440,70 @@ export type Database = {
         Update: Partial<Database["ops"]["Tables"]["outreach_agencies"]["Insert"]>;
         Relationships: [];
       };
+      roles: {
+        Row: {
+          id: string;
+          department_id: string;
+          title: string;
+          kind: "manager" | "employee";
+          subagent_name: string;
+          parent_role_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          department_id: string;
+          title: string;
+          kind: "manager" | "employee";
+          subagent_name: string;
+          parent_role_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["ops"]["Tables"]["roles"]["Insert"]>;
+        Relationships: [];
+      };
+      reports: {
+        Row: {
+          id: string;
+          role_id: string;
+          report_date: string;
+          summary: string;
+          details: Record<string, unknown> | null;
+          recommendations: unknown[] | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          role_id: string;
+          report_date?: string;
+          summary: string;
+          details?: Record<string, unknown> | null;
+          recommendations?: unknown[] | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["ops"]["Tables"]["reports"]["Insert"]>;
+        Relationships: [];
+      };
+      activity_log: {
+        Row: {
+          id: string;
+          role_id: string;
+          action: string;
+          entity_type: string | null;
+          entity_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          role_id: string;
+          action: string;
+          entity_type?: string | null;
+          entity_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["ops"]["Tables"]["activity_log"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
