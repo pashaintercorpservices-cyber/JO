@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   },
   description:
     "Find verified overseas jobs and Gulf jobs abroad — live openings in UAE, Saudi Arabia, Qatar, Oman, Kuwait & Bahrain. Browse assignments abroad on JobsOverseas.",
+  verification: {
+    google: "DEN5VpquEq2CGo2ERtgcebxdBsfXuz1J4sH-Y8U8qzM",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
