@@ -13,29 +13,50 @@ export function ImageUploadField({
   onImageUrlChange: (url: string) => void;
 }) {
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setStatus("uploading");
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `${userId}/${Date.now()}.${ext}`;
-
-    const { error } = await supabase.storage.from("ad-images").upload(path, file, {
-      cacheControl: "3600",
-      upsert: false,
-    });
-
-    if (error) {
+    const MAX_SIZE = 20 * 1024 * 1024; // 20MB — well under Supabase's gateway limit
+    if (file.size > MAX_SIZE) {
+      setErrorMessage(
+        `This file is ${(file.size / (1024 * 1024)).toFixed(1)}MB — please use an image under 20MB.`
+      );
       setStatus("error");
+      e.target.value = "";
       return;
     }
 
-    const { data } = supabase.storage.from("ad-images").getPublicUrl(path);
-    onImageUrlChange(data.publicUrl);
-    setStatus("idle");
+    setStatus("uploading");
+    setErrorMessage(null);
+
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop();
+      const path = `${userId}/${Date.now()}.${ext}`;
+
+      const { error } = await supabase.storage.from("ad-images").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+      if (error) {
+        console.error("Ad image upload failed:", error);
+        setErrorMessage(error.message || "Unknown error");
+        setStatus("error");
+        return;
+      }
+
+      const { data } = supabase.storage.from("ad-images").getPublicUrl(path);
+      onImageUrlChange(data.publicUrl);
+      setStatus("idle");
+    } catch (err) {
+      console.error("Ad image upload threw:", err);
+      setErrorMessage(err instanceof Error ? err.message : "Unexpected error — check your connection.");
+      setStatus("error");
+    }
   }
 
   return (
@@ -48,7 +69,11 @@ export function ImageUploadField({
         the same format typically used for WhatsApp flyers. JPG or PNG.
       </span>
       {status === "uploading" && <span className="hint">Uploading…</span>}
-      {status === "error" && <span className="hint">Upload failed — please try again.</span>}
+      {status === "error" && (
+        <span className="hint" style={{ color: "var(--danger, #c0342c)" }}>
+          Upload failed{errorMessage ? `: ${errorMessage}` : ""} — please try again.
+        </span>
+      )}
       {imageUrl && (
         <div
           style={{
